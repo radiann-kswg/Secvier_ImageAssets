@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier suit heart</title>
+  <g transform="matrix(5.555556,0,0,5.555556,56.000,56.000)">
+    <path d="M36,72 L27,54 L9,36 L0,27 L0,9 L18,0 L27,0 L36,9 L45,0 L54,0 L72,9 L72,27 L63,36 L45,54 Z" fill="#CC1111"/>
+  </g>
+</svg>

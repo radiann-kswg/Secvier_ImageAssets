@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier suit diamond</title>
+  <g transform="matrix(5.555556,0,0,5.555556,56.000,56.000)">
+    <path d="M36,0 L27,18 L18,27 L0,36 L18,45 L27,54 L36,72 L45,54 L54,45 L72,36 L54,27 L45,18 Z" fill="#CC1111"/>
+  </g>
+</svg>
