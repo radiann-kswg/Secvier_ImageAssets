@@ -14,10 +14,10 @@ Secvier ImageAssets — トランプ絵文字 v2
   スート単体絵文字 4枚
   合計 62枚
 
-出力: dist/cards/hakuji_c/card_{suit}_{rank}.png
-             dist/cards/hakuji_c/card_joker_black.png
-             dist/cards/hakuji_c/card_joker_red.png
-             dist/cards/hakuji_c/card_suit_{S,H,D,C}.png
+出力: dist/cards/card_{suit}_{rank}.png
+             dist/cards/card_joker_black.png
+             dist/cards/card_joker_red.png
+             dist/cards/card_suit_{S,H,D,C}.png
 """
 from __future__ import annotations
 import io
@@ -38,7 +38,7 @@ ROOT      = Path(__file__).parent.parent
 FONT_PATH = ROOT / "assets" / "fonts" / "Secvier.otf"
 SUIT_DIR  = ROOT / "src" / "suits"
 NOTO_DIR  = ROOT / "src" / "noto_cards"
-DIST      = ROOT / "dist" / "cards" / "hakuji_c"
+DIST      = ROOT / "dist" / "cards"
 SIZE      = 128
 CX        = SIZE // 2  # 64
 
@@ -507,7 +507,7 @@ def main():
         total += 1
     print(f"  スート絵文字: {len(SUITS)} 枚")
 
-    print(f"\n[OK] 合計 {total} 枚 → dist/cards/hakuji_c/")
+    print(f"\n[OK] 合計 {total} 枚 → dist/cards/")
 
 
 if __name__ == "__main__":

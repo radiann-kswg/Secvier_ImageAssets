@@ -49,7 +49,7 @@ Secvier_ImageAssets/
 │   └── templates/              ← ベーステンプレートSVG
 ├── dist/
 │   ├── alphanum/               ← 出力PNG（72px / 512px）
-│   ├── cards/
+│   ├── cards/                  ← card_{suit}_{rank}.png 直下に配置
 │   ├── dice/
 │   └── mahjong/
 ├── scripts/
