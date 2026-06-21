@@ -1,0 +1,17 @@
+# Secvier ImageAssets — Python依存ライブラリ
+# Python 3.11+ 推奨
+
+# フォント解析・グリフ抽出
+fontTools>=4.53.0
+
+# SVG→PNG変換
+cairosvg>=2.7.1
+
+# 画像処理・PNG最適化
+Pillow>=10.4.0
+
+# SVGファイル生成
+svgwrite>=1.4.3
+
+# CLI引数処理（build.py用）
+click>=8.1.7

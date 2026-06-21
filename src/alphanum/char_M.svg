@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier M</title>
+  <g transform="matrix(0.512000,0,0,-0.512000,46.080,384.000)">
+    <path d="M60.0 700.0V0.0H235.0V525.0L410.0 350.0L585.0 525.0V0.0H760.0V700.0H497.5L410.0 612.5L322.5 700.0Z" fill="#000000"/>
+  </g>
+</svg>
