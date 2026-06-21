@@ -7,15 +7,19 @@
 
 ## プロジェクト概要
 
-独自フォント **Secvier**（作字：RadianN_kswg / ラジアン（扇二春・柏木主税））を用いて、
-以下カテゴリの絵文字アセット（SVG + PNG）を制作するリポジトリです。
+各種SNSおよびチャットサービス（Discord・Misskeyなど）向けに、
+**RadianN_kswg / ラジアン（柏木主税）による独自フォント Secvier** と
+**Claude による Agent 機能**、およびその他のアセット（Noto Emoji など）によって制作された
+カスタム絵文字アセット群リポジトリです。
+
+**著作権者**: RadianN_kswg / ラジアン（扇二春・柏木主税） / **ライセンス**: CC BY 4.0
 
 | カテゴリ | 内容 | 枚数 |
 |---|---|---|
-| トランプ | ♠♥♦♣ × A,2–10,J,Q,K + ジョーカー黒・赤 | 54枚 |
-| ダイス | D4 / D6(×6面) / D8 / D10 / テンズテン(D%) / D12 / D20 | 7種 |
-| 麻雀牌 | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白） | 34枚 |
-| 英数字 | A–Z（大文字） / 0–9 | 36枚 |
+| トランプ | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体 | 62枚 |
+| ダイス | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント |
+| 英数字 | A–Z（大文字） / 0–9 | 5バリアント × 36枚 |
+| 麻雀牌 | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白） | 実装予定 |
 
 ---
 
@@ -43,19 +47,29 @@ Secvier_ImageAssets/
 │       └── Secvier.otf         ← ビルド参照フォント（_original-fontsのコピー）
 ├── src/
 │   ├── alphanum/               ← 英数字 SVGソース（アウトライン化済み）
-│   ├── cards/                  ← トランプ SVGソース
+│   ├── cards/                  ← トランプ SVGソース（v1 旧実装）
+│   ├── suits/                  ← スートマーク SVG
+│   ├── noto_cards/             ← Noto Emoji コートカード SVG（原本、読み取り専用）
+│   ├── noto_cache/             ← Noto SVG キャッシュ（bindfs 回避用）
+│   ├── noto_svg/               ← Noto SVG 補完キャッシュ
 │   ├── dice/                   ← ダイス SVGソース
-│   ├── mahjong/                ← 麻雀牌 SVGソース
+│   ├── mahjong/                ← 麻雀牌 SVGソース（予定）
 │   └── templates/              ← ベーステンプレートSVG
 ├── dist/
-│   ├── alphanum/               ← 出力PNG（72px / 512px）
-│   ├── cards/                  ← card_{suit}_{rank}.png 直下に配置
-│   ├── dice/
-│   └── mahjong/
+│   ├── cards/                  ← card_{S|H|D|C}_{rank}.png / card_joker_{black|red}.png
+│   ├── dice/{variant}/         ← ダイス PNG（バリアント別サブディレクトリ）
+│   ├── alphanum/{variant}/     ← 英数字 PNG（バリアント別サブディレクトリ）
+│   └── mahjong/                ← 麻雀牌 PNG（予定）
+├── svg2png/
+│   ├── alphanum/               ← char_{A-Z,0-9}.svg を単純PNG変換したもの
+│   └── suits/                  ← スートマーク SVG の単純PNG変換
 ├── scripts/
+│   ├── generate_cards_v2.py    ← トランプ絵文字生成【現行メイン】
+│   ├── generate_all_v3.py      ← ダイス・英数字一括生成【現行メイン】
+│   ├── generate_dice_faces.py  ← ダイス出目イラスト生成
 │   ├── inspect_font.py         ← グリフ検査 → docs/glyph_map.txt
 │   ├── extract_glyphs.py       ← フォントアウトライン → src/alphanum/ SVG
-│   ├── render_svg.py           ← フォント埋め込みSVG生成（トランプ等の合成用）
+│   ├── render_svg.py           ← SVG合成ユーティリティ
 │   ├── export_png.py           ← SVG → PNG変換
 │   └── build.py                ← 全カテゴリ一括ビルド
 ├── docs/
@@ -75,7 +89,8 @@ Secvier_ImageAssets/
 | トランプ | `card_{suit}_{value}.svg` | `card_spade_A.svg`, `card_joker_black.svg` |
 | ダイス | `dice_{type}_{face}.svg` | `dice_d6_6.svg` |
 | 麻雀牌 | `mj_{suit}_{id}.svg` | `mj_man_1.svg`, `mj_char_east.svg` |
-| PNG出力 | `{stem}_72.png` / `{stem}_512.png` | `char_A_512.png` |
+| PNG出力（dist） | `{stem}_72.png` / `{stem}_512.png` | `char_A_512.png` |
+| SVG→PNG単純変換（svg2png） | `{stem}.png` | `char_A.png`, `spade.png` |
 
 ### suit / type / id の定義値
 
@@ -93,10 +108,13 @@ Secvier_ImageAssets/
 - **主要ライブラリ**:
   - `fonttools` — フォントグリフ解析・アウトライン抽出（`SVGPathPen`）
   - `cairosvg` — SVG→PNG変換
-  - `Pillow` — PNG後処理（サイズ調整・最適化）
+  - `Pillow` — PNG後処理・絵文字画像生成
+  - `PyMuPDF` — Noto Emoji SVGの高品質レンダリング（コートカード用）
+  - `numpy` — ピクセル配列操作（着色・マスク処理）
   - `svgwrite` — SVGファイル生成補助
   - `click` — CLIインターフェース
 - **フォントファイル**: `assets/fonts/Secvier.otf`
+- **外部アセット**: `src/noto_cards/` — Noto Emoji playing card SVG（Google LLC, SIL OFL 1.1）
 
 ---
 

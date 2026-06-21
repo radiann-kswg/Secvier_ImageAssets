@@ -7,10 +7,13 @@
 
 ## プロジェクト概要
 
-独自フォント **Secvier**（作字：RadianN_kswg / ラジアン（扇二春・柏木主税））を使用した
-絵文字アセット（PNG/SVG）制作リポジトリ。
+各種SNSおよびチャットサービス（Discord・Misskeyなど）向けに、
+**RadianN_kswg / ラジアン（柏木主税）による独自フォント Secvier** と
+**Claude による Agent 機能**、およびその他のアセット（Noto Emoji など）によって制作された
+カスタム絵文字アセット群リポジトリ。
 
-**ライセンス**: CC BY 4.0 — 著作権者：RadianN_kswg / ラジアン（扇二春・柏木主税）
+**著作権者**: RadianN_kswg / ラジアン（扇二春・柏木主税） / **ライセンス**: CC BY 4.0  
+コートカード人物図柄: Noto Emoji (Google LLC, SIL OFL 1.1)
 
 ---
 
@@ -34,10 +37,17 @@
 
 ```
 src/alphanum/char_{A-Z,0-9}.svg    ← extract_glyphs.py 出力（変更不要）
-src/cards/card_{suit}_{value}.svg  ← render_svg.py 出力
+src/suits/{spade,heart,diamond,club}.svg  ← スートマーク SVG
+src/noto_cards/*.svg               ← Noto Emoji 原本（読み取り専用）
 src/{dice,mahjong}/*.svg           ← SVGデザイン手作業 or スクリプト出力
-dist/**/*.png                      ← build.py 経由のみ（手動配置禁止）
+svg2png/alphanum/char_*.png        ← SVG の単純PNG変換（装飾なし）
+svg2png/suits/*.png                ← スートマーク SVG の単純PNG変換
+dist/cards/card_*.png              ← generate_cards_v2.py 出力（128×128px）
+dist/dice/{variant}/*.png          ← generate_all_v3.py 出力
+dist/alphanum/{variant}/*.png      ← generate_all_v3.py 出力
 ```
+
+`dist/` への直接配置は禁止。`svg2png/` はユーティリティ用途（絵文字出力は `dist/`）。
 
 ---
 
