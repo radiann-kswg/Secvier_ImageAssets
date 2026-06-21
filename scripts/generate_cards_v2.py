@@ -27,8 +27,8 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-import fitz  # PyMuPDF
-
+import fitz        # PyMuPDF
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 # ════════════════════════════════════════════
@@ -37,7 +37,17 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT      = Path(__file__).parent.parent
 FONT_PATH = ROOT / "assets" / "fonts" / "Secvier.otf"
 SUIT_DIR  = ROOT / "src" / "suits"
-NOTO_DIR  = ROOT / "src" / "noto_cards"
+NOTO_DIR   = ROOT / "src" / "noto_cards"
+NOTO_CACHE = ROOT / "src" / "noto_cache"   # bindfs 回避用キャッシュ
+NOTO_SVG   = ROOT / "src" / "noto_svg"     # 追加キャッシュ
+
+def get_noto_path(name: str) -> Path:
+    """noto_svg → noto_cache → noto_cards の順で有効なSVGを探す。"""
+    for d in (NOTO_SVG, NOTO_CACHE, NOTO_DIR):
+        p = d / name
+        if p.exists() and p.stat().st_size > 200:
+            return p
+    return NOTO_DIR / name  # フォールバック（0バイトでも返す）
 DIST      = ROOT / "dist" / "cards"
 SIZE      = 128
 CX        = SIZE // 2  # 64
@@ -166,6 +176,62 @@ JOKER_FILE: dict[str, str] = {
     'black': 'PLAYING CARD BLACK JOKER',
     'red':   'PLAYING CARD RED JOKER',
 }
+
+def render_noto_figure(svg_path: Path, v: V,
+                       out_w: int, out_h: int) -> Image.Image | None:
+    """
+    Noto コートカード SVG から人物図柄を抽出し、バリアント配色で着色。
+    処理:
+      1. 3倍サイズで高解像度レンダリング
+      2. 外縁カード枠を透過化（上下左右 6%）
+      3. コーナーインデックス（ランク+スート）を消去（左上・右下 30%×28%）
+      4. 残ピクセル（人物図）をバリアントの sline カラーに着色
+      5. out_w × out_h にリサイズ
+    """
+    if not svg_path.exists() or svg_path.stat().st_size < 200:
+        return None
+    try:
+        scale_up = 3
+        rw, rh = out_w * scale_up, out_h * scale_up
+
+        svg_bytes = svg_path.read_bytes()
+        doc  = fitz.open(stream=svg_bytes, filetype="svg")
+        page = doc[0]
+        sx   = rw / page.rect.width
+        sy   = rh / page.rect.height
+        pix  = page.get_pixmap(matrix=fitz.Matrix(sx, sy), alpha=True)
+        img  = Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGBA")
+        arr  = np.array(img, dtype=np.uint8)
+
+        # ① 外縁カード枠を透過（上下左右 6%）
+        bx = int(rw * 0.06)
+        by = int(rh * 0.06)
+        arr[:by, :, 3] = 0
+        arr[rh - by:, :, 3] = 0
+        arr[:, :bx, 3] = 0
+        arr[:, rw - bx:, 3] = 0
+
+        # ② Noto コーナーインデックス消去（Notoコーナー全域 ≈ 36%W×46%H）
+        cx_px = int(rw * 0.36)
+        cy_px = int(rh * 0.46)
+        arr[:cy_px, :cx_px, 3] = 0
+        arr[rh - cy_px:, rw - cx_px:, 3] = 0
+
+        # ③ 残ピクセルをスート sline カラーに着色（fitz 描画は純黒なのでアルファのみ判定）
+        pip_r, pip_g, pip_b = v.sline[:3]
+        dark_mask = arr[:, :, 3] > 10
+        arr[dark_mask, 0] = pip_r
+        arr[dark_mask, 1] = pip_g
+        arr[dark_mask, 2] = pip_b
+        # アルファは元のまま（エッジのアンチエイリアスを保持）
+
+        result = Image.fromarray(arr, 'RGBA')
+        result = result.resize((out_w, out_h), Image.LANCZOS)
+        return result
+    except Exception as e:
+        print(f"  noto_figure error for {svg_path.name}: {e}", file=sys.stderr)
+        return None
+
 
 def render_noto_svg(svg_path: Path, out_w: int, out_h: int,
                     crop_frac: float = 0.0) -> Image.Image | None:
@@ -301,17 +367,17 @@ def make_card_base(v: V) -> tuple[Image.Image, ImageDraw.ImageDraw]:
 # コーナーインデックス（ランク + 小スートマーク）
 # ════════════════════════════════════════════
 def make_corner(rank: str, suit: str, v: V) -> Image.Image:
-    """22×30 RGBA コーナーインデックス画像。"""
-    W, H  = 22, 30
+    """26×38 RGBA コーナーインデックス画像（数字大きめ）。"""
+    W, H  = 26, 38
     ci    = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     cd    = ImageDraw.Draw(ci)
-    fsize = 14 if len(rank) == 1 else 11
+    fsize = 19 if len(rank) == 1 else 15   # ← 数字サイズ拡大
     # ランク文字
-    cd.text((W//2, 1), rank, font=lf(fsize), fill=v.border[:3]+(255,), anchor="mt")
-    # 小スートマーク（12×12）
+    cd.text((W//2, 0), rank, font=lf(fsize), fill=v.border[:3]+(255,), anchor="mt")
+    # 小スートマーク（15×15）
     pip_col = v.sline[:3] + (255,)
-    pip_img = render_suit_svg(suit, 12, pip_col)
-    ci.alpha_composite(pip_img, (W//2 - 6, H - 13))
+    pip_img = render_suit_svg(suit, 15, pip_col)
+    ci.alpha_composite(pip_img, (W//2 - 7, H - 16))
     return ci
 
 def paste_corners(img: Image.Image, rank: str, suit: str, v: V):
@@ -326,11 +392,11 @@ def paste_corners(img: Image.Image, rank: str, suit: str, v: V):
 # ピップレイアウト
 # ════════════════════════════════════════════
 # カード面内ピップ領域
-PL, PM_X, PR = 34, CX, 94
-PT, PB       = 40, 90
-PM_Y         = (PT + PB) // 2
-PUM          = PT + (PM_Y - PT) * 2 // 5
-PLM          = PM_Y + (PB - PM_Y) * 3 // 5
+PL, PM_X, PR = 46, CX, 82          # 横幅を狭める（旧: 34, 64, 94）
+PT, PB       = 36, 108
+PM_Y         = (PT + PB) // 2   # 72
+PUM          = PT + (PM_Y - PT) * 2 // 5   # 50
+PLM          = PM_Y + (PB - PM_Y) * 3 // 5  # 93
 
 PIP_POSITIONS: dict[str, list[tuple[int, int]]] = {
     '2':  [(PM_X, PT+2),  (PM_X, PB-2)],
@@ -341,22 +407,23 @@ PIP_POSITIONS: dict[str, list[tuple[int, int]]] = {
     '7':  [(PL, PT+2),   (PR, PT+2),   (PM_X, PUM),  (PL, PM_Y), (PR, PM_Y), (PL, PB-2), (PR, PB-2)],
     '8':  [(PL, PT+2),   (PR, PT+2),   (PM_X, PUM),  (PL, PM_Y), (PR, PM_Y),
            (PM_X, PLM),  (PL, PB-2),   (PR, PB-2)],
-    '9':  [(PL, PT+2),   (PR, PT+2),   (PL, PUM),    (PR, PUM),  (PM_X, PM_Y),
-           (PL, PLM),    (PR, PLM),    (PL, PB-2),   (PR, PB-2)],
-    '10': [(PL, PT+2),   (PR, PT+2),   (PM_X, PT+12),(PL, PUM),  (PR, PUM),
-           (PL, PLM),    (PR, PLM),    (PM_X, PB-12),(PL, PB-2), (PR, PB-2)],
+    # 9/10: 左右列を縦方向均等4段配置（PT=36, PB=108, 間隔24px）
+    '9':  [(PL, 36), (PR, 36), (PL, 60), (PR, 60), (PM_X, PM_Y),
+           (PL, 84), (PR, 84), (PL, 108),(PR, 108)],
+    '10': [(PL, 36), (PR, 36), (PM_X, 48),(PL, 60), (PR, 60),
+           (PL, 84), (PR, 84), (PM_X, 96),(PL, 108),(PR, 108)],
 }
 
 def draw_pips(img: Image.Image, rank: str, suit: str, v: V):
     """数字カードのピップを配置。"""
     pip_col = v.sline[:3] + (255,)
     if rank == 'A':
-        # エース: 大きなスートマーク中央
-        pip_sz = 44
+        # エース: 大きなスートマーク中央（拡大）
+        pip_sz = 52
         pip_img = render_suit_svg(suit, pip_sz, pip_col)
-        img.alpha_composite(pip_img, (CX - pip_sz//2, 65 - pip_sz//2))
+        img.alpha_composite(pip_img, (CX - pip_sz//2, 62 - pip_sz//2))
     else:
-        pip_sz = 14
+        pip_sz = 16
         pip_img = render_suit_svg(suit, pip_sz, pip_col)
         for px, py in PIP_POSITIONS.get(rank, []):
             img.alpha_composite(pip_img, (px - pip_sz//2, py - pip_sz//2))
@@ -364,18 +431,18 @@ def draw_pips(img: Image.Image, rank: str, suit: str, v: V):
 # ════════════════════════════════════════════
 # コートカード（J/C/Q/K）
 # ════════════════════════════════════════════
-FACE_AREA_W = 84   # コートカード図柄幅
-FACE_AREA_H = 78   # コートカード図柄高
-FACE_X      = CX - FACE_AREA_W // 2  # 22
-FACE_Y      = 32                       # 図柄上端
+FACE_AREA_W = 110  # コートカード図柄幅 = カード面全幅
+FACE_AREA_H = 122  # コートカード図柄高 = カード面全高
+FACE_X      = CX1  # = 9
+FACE_Y      = CY1  # = 3
 
 def draw_face_card(img: Image.Image, draw: ImageDraw.ImageDraw,
                    rank: str, suit: str, v: V):
-    """Noto SVGを使用。利用不可の場合はフォールバック表示。"""
+    """Noto SVGから人物図柄を抽出・着色して配置。利用不可の場合はフォールバック。"""
     svg_name = f"PLAYING CARD {RANK_NAME[rank]} OF {SUIT_NAME[suit]}.svg"
-    svg_path = NOTO_DIR / svg_name
+    svg_path = get_noto_path(svg_name)
 
-    noto_img = render_noto_svg(svg_path, FACE_AREA_W, FACE_AREA_H, crop_frac=0.08)
+    noto_img = render_noto_figure(svg_path, v, FACE_AREA_W, FACE_AREA_H)
     if noto_img is not None:
         img.alpha_composite(noto_img, (FACE_X, FACE_Y))
     else:
@@ -401,11 +468,11 @@ def make_joker_card(color: str) -> Image.Image:
 
     pip_col = v.sline[:3] + (255,)
 
-    # Noto SVG ジョーカー
-    svg_path = NOTO_DIR / f"{JOKER_FILE[color]}.svg"
-    noto_img = render_noto_svg(svg_path, FACE_AREA_W, FACE_AREA_H + 16, crop_frac=0.06)
+    # Noto SVG ジョーカー（人物図柄抽出・バリアント着色）
+    svg_path = get_noto_path(f"{JOKER_FILE[color]}.svg")
+    noto_img = render_noto_figure(svg_path, v, FACE_AREA_W, FACE_AREA_H + 10)
     if noto_img is not None:
-        img.alpha_composite(noto_img, (FACE_X, FACE_Y - 4))
+        img.alpha_composite(noto_img, (FACE_X, FACE_Y - 2))
     else:
         # フォールバック: "JOKER" テキスト + スート4個
         draw.text((CX, 62), "JOKER", font=lf(16), fill=pip_col, anchor="mm")
@@ -416,20 +483,11 @@ def make_joker_card(color: str) -> Image.Image:
             sm_img = render_suit_svg(suit, sm, sm_col)
             img.alpha_composite(sm_img, (ox, oy))
 
-    # コーナー "JK" ラベル + スート4個
-    ci_w, ci_h = 22, 30
+    # コーナー "JOKER" 横書きラベル（数字カードのランク文字と同様の扱い）
+    ci_w, ci_h = 26, 20
     ci = Image.new("RGBA", (ci_w, ci_h), (0, 0, 0, 0))
     cd = ImageDraw.Draw(ci)
-    cd.text((ci_w//2, 1), "JK", font=lf(11), fill=pip_col, anchor="mt")
-    # 4スートを小さく並べる
-    mini = 6
-    suits_row = ['S','H','D','C']
-    for i, s in enumerate(suits_row):
-        sc_col = VARIANTS[SUIT_VARIANT[s]].sline[:3] + (255,)
-        si     = render_suit_svg(s, mini, sc_col)
-        ox     = (i % 2) * (mini + 1)
-        oy     = ci_h - mini * 2 - 2 + (i // 2) * (mini + 1)
-        ci.alpha_composite(si, (ox, oy))
+    cd.text((ci_w // 2, 1), "JOKER", font=lf(8), fill=pip_col, anchor="mt")
     img.alpha_composite(ci, (CX1 + 2, CY1 + 2))
     img.alpha_composite(ci.rotate(180), (CX2 - 2 - ci_w, CY2 - 2 - ci_h))
 
@@ -461,9 +519,6 @@ SUITS      = ['S','H','D','C']
 
 def main():
     DIST.mkdir(parents=True, exist_ok=True)
-
-    # 古いバリアントディレクトリは手動削除してください
-    # (dist/cards/seiyuu_c/, dist/cards/sakin_c/)
 
     total = 0
 
