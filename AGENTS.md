@@ -14,12 +14,13 @@
 
 **著作権者**: RadianN_kswg / ラジアン（柏木主税） / **ライセンス**: CC BY 4.0
 
-| カテゴリ | 内容                                                          | 枚数               |
-| -------- | ------------------------------------------------------------- | ------------------ |
-| トランプ | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体         | 62枚               |
-| ダイス   | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント        |
-| 英数字   | A–Z（大文字） / 0–9                                           | 5バリアント × 36枚 |
-| 麻雀牌   | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）       | 実装予定           |
+| カテゴリ       | 内容                                                          | 枚数                          |
+| -------------- | ------------------------------------------------------------- | ----------------------------- |
+| トランプ       | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体         | 62枚（Discord/Misskey各対応） |
+| ダイス         | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント                   |
+| 英数字         | A–Z（大文字） / 0–9（デュアルモード対応）                     | 6バリアント × 36枚            |
+| スートマーク   | ♠♥♦♣ 透過デュアルモード版（各2色）                            | 8種                           |
+| 麻雀牌         | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）       | 実装予定                      |
 
 ---
 
@@ -56,24 +57,35 @@ Secvier_ImageAssets/
 │   ├── mahjong/                ← 麻雀牌 SVGソース（予定）
 │   └── templates/              ← ベーステンプレートSVG
 ├── dist/
-│   ├── cards/                  ← card_{S|H|D|C}_{rank}.png / card_joker_{black|red}.png
+│   ├── cards/
+│   │   ├── discord/            ← Discord向け 256×256px トランプ PNG
+│   │   └── misskey/            ← Misskey向け 256×320px トランプ PNG
 │   ├── dice/{variant}/         ← ダイス PNG（バリアント別サブディレクトリ）
-│   ├── alphanum/{variant}/     ← 英数字 PNG（バリアント別サブディレクトリ）
+│   ├── alphanum/{variant}/     ← 英数字 PNG（バリアント別、通常版）
+│   ├── alphanum_dualmode/{variant}/ ← 英数字 PNG（透過デュアルモード版）
+│   ├── suits_dualmode/         ← スートマーク 透過デュアルモード版
 │   └── mahjong/                ← 麻雀牌 PNG（予定）
 ├── svg2png/
 │   ├── alphanum/               ← char_{A-Z,0-9}.svg を単純PNG変換したもの
 │   └── suits/                  ← スートマーク SVG の単純PNG変換
 ├── scripts/
 │   ├── generate_cards_v2.py    ← トランプ絵文字生成【現行メイン】
+│   ├── generate_cards_dualmode.py ← Discord/Misskey向けトランプ生成【現行メイン】
 │   ├── generate_all_v3.py      ← ダイス・英数字一括生成【現行メイン】
+│   ├── generate_dualmode.py    ← 英数字・スートマーク デュアルモード生成【現行メイン】
 │   ├── generate_dice_faces.py  ← ダイス出目イラスト生成
+│   ├── build_misskey_zip.py    ← Misskey一括インポート用zip生成
 │   ├── inspect_font.py         ← グリフ検査 → docs/glyph_map.txt
 │   ├── extract_glyphs.py       ← フォントアウトライン → src/alphanum/ SVG
 │   ├── render_svg.py           ← SVG合成ユーティリティ
 │   ├── export_png.py           ← SVG → PNG変換
 │   └── build.py                ← 全カテゴリ一括ビルド
 ├── docs/
-│   └── glyph_map.txt           ← inspect_font.py が自動生成
+│   ├── glyph_map.txt           ← inspect_font.py が自動生成
+│   └── cards_dualmode_spec.md  ← Discord/Misskey向けトランプ仕様書
+├── proposals_dualmode/         ← デュアルモード初期デザイン提案（作業履歴）
+├── proposals_dualmode_v2/      ← デュアルモード v2 デザイン提案（作業履歴）
+├── _exported-dist/             ← エクスポートzip格納（.gitignore対象）
 ├── _original-fonts/            ← 原本（読み取り専用）
 ├── requirements.txt
 └── LICENSE
@@ -111,6 +123,7 @@ Secvier_ImageAssets/
   - `Pillow` — PNG後処理・絵文字画像生成
   - `PyMuPDF` — Noto Emoji SVGの高品質レンダリング（コートカード用）
   - `numpy` — ピクセル配列操作（着色・マスク処理）
+  - `scipy` — 画像ラベリング処理（デュアルモードカード生成用）
   - `svgwrite` — SVGファイル生成補助
   - `click` — CLIインターフェース
 - **フォントファイル**: `assets/fonts/Secvier.otf`
@@ -142,12 +155,21 @@ Secvier.otf
 ### ビルドコマンド早見表
 
 ```bash
-pip install -r requirements.txt          # 初回セットアップ
-python scripts/inspect_font.py           # フォント検査
-python scripts/extract_glyphs.py         # 英数字グリフSVG抽出
-python scripts/build.py                  # 全カテゴリビルド
-python scripts/build.py --category cards # カテゴリ指定
-python scripts/build.py --dry-run        # 実行確認（ファイル生成なし）
+pip install -r requirements.txt             # 初回セットアップ
+python scripts/inspect_font.py              # フォント検査
+python scripts/extract_glyphs.py            # 英数字グリフSVG抽出
+python scripts/build.py                     # 全カテゴリビルド
+python scripts/build.py --category cards    # カテゴリ指定
+python scripts/build.py --dry-run           # 実行確認（ファイル生成なし）
+
+# Discord/Misskey向けトランプ生成 → dist/cards/discord/, dist/cards/misskey/
+python scripts/generate_cards_dualmode.py
+
+# 英数字・スートマーク デュアルモード生成 → dist/alphanum_dualmode/, dist/suits_dualmode/
+python scripts/generate_dualmode.py
+
+# Misskey一括インポートzip生成 → _exported-dist/secvier-misskey-{timestamp}.zip
+python scripts/build_misskey_zip.py
 ```
 
 ---

@@ -36,18 +36,23 @@
 ### ファイル配置
 
 ```
-src/alphanum/char_{A-Z,0-9}.svg    ← extract_glyphs.py 出力（変更不要）
+src/alphanum/char_{A-Z,0-9}.svg        ← extract_glyphs.py 出力（変更不要）
 src/suits/{spade,heart,diamond,club}.svg  ← スートマーク SVG
-src/noto_cards/*.svg               ← Noto Emoji 原本（読み取り専用）
-src/{dice,mahjong}/*.svg           ← SVGデザイン手作業 or スクリプト出力
-svg2png/alphanum/char_*.png        ← SVG の単純PNG変換（装飾なし）
-svg2png/suits/*.png                ← スートマーク SVG の単純PNG変換
-dist/cards/card_*.png              ← generate_cards_v2.py 出力（128×128px）
-dist/dice/{variant}/*.png          ← generate_all_v3.py 出力
-dist/alphanum/{variant}/*.png      ← generate_all_v3.py 出力
+src/noto_cards/*.svg                   ← Noto Emoji 原本（読み取り専用）
+src/{dice,mahjong}/*.svg               ← SVGデザイン手作業 or スクリプト出力
+svg2png/alphanum/char_*.png            ← SVG の単純PNG変換（装飾なし）
+svg2png/suits/*.png                    ← スートマーク SVG の単純PNG変換
+dist/cards/discord/card_*.png          ← generate_cards_dualmode.py 出力（256×256px）
+dist/cards/misskey/card_*.png          ← generate_cards_dualmode.py 出力（256×320px）
+dist/dice/{variant}/*.png              ← generate_all_v3.py 出力
+dist/alphanum/{variant}/*.png          ← generate_all_v3.py 出力（通常版）
+dist/alphanum_dualmode/{variant}/*.png ← generate_dualmode.py 出力（透過デュアルモード）
+dist/suits_dualmode/*.png              ← generate_dualmode.py 出力（透過デュアルモード）
+_exported-dist/*.zip                   ← build_misskey_zip.py 出力（.gitignore対象）
 ```
 
 `dist/` への直接配置は禁止。`svg2png/` はユーティリティ用途（絵文字出力は `dist/`）。
+`_exported-dist/` は `.gitignore` 対象のため git 管理外。
 
 ---
 
