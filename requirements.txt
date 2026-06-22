@@ -21,3 +21,6 @@ PyMuPDF>=1.24.0
 
 # 画像配列操作（generate_cards_v2.py / ピクセル着色処理）
 numpy>=1.26.0
+
+# コート図柄再構成のラベリング処理（generate_cards_dualmode.py）
+scipy>=1.11.0

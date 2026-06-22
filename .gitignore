@@ -1,6 +1,10 @@
 # original fonts
 _original-fonts/
 
+# zip files for importing
+*.zip
+_exported-dist/
+
 # Python
 __pycache__/
 *.py[cod]

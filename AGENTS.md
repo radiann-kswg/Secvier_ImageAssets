@@ -12,20 +12,20 @@
 **Claude による Agent 機能**、およびその他のアセット（Noto Emoji など）によって制作された
 カスタム絵文字アセット群リポジトリです。
 
-**著作権者**: RadianN_kswg / ラジアン（扇二春・柏木主税） / **ライセンス**: CC BY 4.0
+**著作権者**: RadianN_kswg / ラジアン（柏木主税） / **ライセンス**: CC BY 4.0
 
-| カテゴリ | 内容 | 枚数 |
-|---|---|---|
-| トランプ | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体 | 62枚 |
-| ダイス | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント |
-| 英数字 | A–Z（大文字） / 0–9 | 5バリアント × 36枚 |
-| 麻雀牌 | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白） | 実装予定 |
+| カテゴリ | 内容                                                          | 枚数               |
+| -------- | ------------------------------------------------------------- | ------------------ |
+| トランプ | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体         | 62枚               |
+| ダイス   | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント        |
+| 英数字   | A–Z（大文字） / 0–9                                           | 5バリアント × 36枚 |
+| 麻雀牌   | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）       | 実装予定           |
 
 ---
 
 ## 権限・ライセンス（最優先）
 
-- **著作権者**：RadianN_kswg / ラジアン（扇二春・柏木主税）
+- **著作権者**：RadianN_kswg / ラジアン（柏木主税）
 - **ライセンス**：CC BY 4.0
 - Secvierフォントのグリフは著作者の独自創作物。
   第三者フォント・商用グリフのグリフパスを流用することを**絶対に行わないこと**。
@@ -83,14 +83,14 @@ Secvier_ImageAssets/
 
 ## ファイル命名規則
 
-| カテゴリ | 命名パターン | 例 |
-|---|---|---|
-| 英数字 | `char_{文字}.svg` | `char_A.svg`, `char_0.svg` |
-| トランプ | `card_{suit}_{value}.svg` | `card_spade_A.svg`, `card_joker_black.svg` |
-| ダイス | `dice_{type}_{face}.svg` | `dice_d6_6.svg` |
-| 麻雀牌 | `mj_{suit}_{id}.svg` | `mj_man_1.svg`, `mj_char_east.svg` |
-| PNG出力（dist） | `{stem}_72.png` / `{stem}_512.png` | `char_A_512.png` |
-| SVG→PNG単純変換（svg2png） | `{stem}.png` | `char_A.png`, `spade.png` |
+| カテゴリ                   | 命名パターン                       | 例                                         |
+| -------------------------- | ---------------------------------- | ------------------------------------------ |
+| 英数字                     | `char_{文字}.svg`                  | `char_A.svg`, `char_0.svg`                 |
+| トランプ                   | `card_{suit}_{value}.svg`          | `card_spade_A.svg`, `card_joker_black.svg` |
+| ダイス                     | `dice_{type}_{face}.svg`           | `dice_d6_6.svg`                            |
+| 麻雀牌                     | `mj_{suit}_{id}.svg`               | `mj_man_1.svg`, `mj_char_east.svg`         |
+| PNG出力（dist）            | `{stem}_72.png` / `{stem}_512.png` | `char_A_512.png`                           |
+| SVG→PNG単純変換（svg2png） | `{stem}.png`                       | `char_A.png`, `spade.png`                  |
 
 ### suit / type / id の定義値
 
@@ -201,6 +201,7 @@ def render_glyph(char: str, output: Path, size: int = 512) -> None:
 - **言語**: 日本語・英語いずれも可（混在可）
 
 例:
+
 ```
 feat(alphanum): add A-Z / 0-9 outlined SVGs from Secvier font
 build(scripts): add extract_glyphs.py for SVGPathPen outline extraction
@@ -216,12 +217,12 @@ docs: update AGENTS.md with unified agent instructions
 実質収録:   A–Z（大文字、小文字も同グリフにマップ） / 0–9
 ```
 
-| カテゴリ | フォントグリフ利用 | 制作アプローチ |
-|---|---|---|
-| 英数字 | ✅ A–Z / 0–9 直接使用 | `extract_glyphs.py` でアウトライン化 |
-| トランプ | ✅ 値文字（A/J/Q/K/2–10）はフォント、スートはSVG図形 | `render_svg.py` で合成 |
-| ダイス | ❌ グリフなし | SVGで面ごとにデザイン |
-| 麻雀牌 | ❌ グリフなし | SVGで牌ごとにデザイン |
+| カテゴリ | フォントグリフ利用                                   | 制作アプローチ                       |
+| -------- | ---------------------------------------------------- | ------------------------------------ |
+| 英数字   | ✅ A–Z / 0–9 直接使用                                | `extract_glyphs.py` でアウトライン化 |
+| トランプ | ✅ 値文字（A/J/Q/K/2–10）はフォント、スートはSVG図形 | `render_svg.py` で合成               |
+| ダイス   | ❌ グリフなし                                        | SVGで面ごとにデザイン                |
+| 麻雀牌   | ❌ グリフなし                                        | SVGで牌ごとにデザイン                |
 
 フォントが更新されたら `python scripts/inspect_font.py` を再実行し
 `docs/glyph_map.txt` で差分を確認すること。

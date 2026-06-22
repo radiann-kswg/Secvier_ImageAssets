@@ -12,7 +12,7 @@
 **Claude による Agent 機能**、およびその他のアセット（Noto Emoji など）によって制作された
 カスタム絵文字アセット群リポジトリ。
 
-**著作権者**: RadianN_kswg / ラジアン（扇二春・柏木主税） / **ライセンス**: CC BY 4.0  
+**著作権者**: RadianN_kswg / ラジアン（柏木主税） / **ライセンス**: CC BY 4.0
 コートカード人物図柄: Noto Emoji (Google LLC, SIL OFL 1.1)
 
 ---
@@ -66,13 +66,13 @@ dist/alphanum/{variant}/*.png      ← generate_all_v3.py 出力
 <type>(<scope>): <subject>
 ```
 
-| type | 用途 |
-|---|---|
-| `feat` | 新機能・新アセット追加 |
-| `fix` | バグ修正 |
-| `build` | ビルドスクリプト変更 |
-| `docs` | ドキュメント更新 |
+| type    | 用途                         |
+| ------- | ---------------------------- |
+| `feat`  | 新機能・新アセット追加       |
+| `fix`   | バグ修正                     |
+| `build` | ビルドスクリプト変更         |
+| `docs`  | ドキュメント更新             |
 | `chore` | 設定ファイル・メタデータ変更 |
-| `style` | SVGスタイル・見た目の調整 |
+| `style` | SVGスタイル・見た目の調整    |
 
 例: `feat(alphanum): add outlined SVGs for A-Z and 0-9`

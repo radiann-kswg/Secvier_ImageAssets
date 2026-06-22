@@ -11,16 +11,10 @@
 </style></defs>
   <rect width="512" height="512" rx="36"
         fill="#FAFAFA" stroke="#C8C8C8" stroke-width="4"/>
-  <path d="M36,0 L27,9 L9,27 L0,45 L18,63 L27,63 L36,54 L45,63 L54,63 L72,45 L63,27 L45,9 Z M27,72 L45,72 L36,54 Z" fill="#1A1A1A" transform="translate(224.00,182.00) scale(0.88889)"/>
-<path d="M36,72 L27,54 L9,36 L0,27 L0,9 L18,0 L27,0 L36,9 L45,0 L54,0 L72,9 L72,27 L63,36 L45,54 Z" fill="#CC1111" transform="translate(224.00,266.00) scale(0.88889)"/>
-<path d="M36,0 L27,18 L18,27 L0,36 L18,45 L27,54 L36,72 L45,54 L54,45 L72,36 L54,27 L45,18 Z" fill="#CC1111" transform="translate(182.00,224.00) scale(0.88889)"/>
-<path d="M18,27 L18,9 L27,0 L45,0 L54,9 L54,27 L36,45 Z M27,63 L9,63 L0,54 L0,36 L9,27 L18,27 L36,54 Z M45,63 L63,63 L72,54 L72,36 L63,27 L54,27 L36,54 Z M27,72 L45,72 L36,54 Z" fill="#1A1A1A" transform="translate(266.00,224.00) scale(0.88889)"/>
-  <text x="256.0" y="236.0"
-    font-family="Secvier" font-size="100"
-    text-anchor="middle" fill="#1A1A1A">J</text>
-  <text x="256.0" y="376.0"
-    font-family="Secvier" font-size="100"
-    text-anchor="middle" fill="#1A1A1A">K</text>
-  <text x="38" y="108" font-family="Secvier" font-size="80" fill="#1A1A1A" text-anchor="start">J</text>
-  <g transform="rotate(180,256.0,256.0)"><text x="38" y="108" font-family="Secvier" font-size="80" fill="#1A1A1A" text-anchor="start">J</text></g>
+  <path d="M36,0 L27,9 L9,27 L0,45 L18,63 L27,63 L36,54 L45,63 L54,63 L72,45 L63,27 L45,9 Z M27,72 L45,72 L36,54 Z" fill="#1A1A1A" transform="translate(224.00,154.00) scale(0.88889)"/>
+<path d="M36,72 L27,54 L9,36 L0,27 L0,9 L18,0 L27,0 L36,9 L45,0 L54,0 L72,9 L72,27 L63,36 L45,54 Z" fill="#CC1111" transform="translate(224.00,294.00) scale(0.88889)"/>
+<path d="M36,0 L27,18 L18,27 L0,36 L18,45 L27,54 L36,72 L45,54 L54,45 L72,36 L54,27 L45,18 Z" fill="#CC1111" transform="translate(154.00,224.00) scale(0.88889)"/>
+<path d="M18,27 L18,9 L27,0 L45,0 L54,9 L54,27 L36,45 Z M27,63 L9,63 L0,54 L0,36 L9,27 L18,27 L36,54 Z M45,63 L63,63 L72,54 L72,36 L63,27 L54,27 L36,54 Z M27,72 L45,72 L36,54 Z" fill="#1A1A1A" transform="translate(294.00,224.00) scale(0.88889)"/>
+  <text x="40" y="145" transform="rotate(-90,40,145)" font-family="Secvier" font-size="36" fill="#1A1A1A" text-anchor="middle">JOKER</text>
+  <g transform="rotate(180,256.0,256.0)"><text x="40" y="145" transform="rotate(-90,40,145)" font-family="Secvier" font-size="36" fill="#1A1A1A" text-anchor="middle">JOKER</text></g>
 </svg>
