@@ -177,6 +177,10 @@ JOKER_FILE: dict[str, str] = {
     'red':   'PLAYING CARD RED JOKER',
 }
 
+_NOTO_ZOOM     = 1.4   # 拡大倍率: ZOOMレンダー後クロップで余白を狭める
+_NOTO_CORNER_W = 30    # 最終画像コーナー余白幅 (Secvierラベル26px + 4px)
+_NOTO_CORNER_H = 44    # 最終画像コーナー余白高 (Secvierラベル38px + 6px)
+
 def render_noto_figure(svg_path: Path, v: V,
                        out_w: int, out_h: int) -> Image.Image | None:
     """
@@ -191,8 +195,12 @@ def render_noto_figure(svg_path: Path, v: V,
     if not svg_path.exists() or svg_path.stat().st_size < 200:
         return None
     try:
+        zoom     = _NOTO_ZOOM
+        render_w = int(out_w * zoom)
+        render_h = int(out_h * zoom)
+
         scale_up = 3
-        rw, rh = out_w * scale_up, out_h * scale_up
+        rw, rh   = render_w * scale_up, render_h * scale_up
 
         svg_bytes = svg_path.read_bytes()
         doc  = fitz.open(stream=svg_bytes, filetype="svg")
@@ -211,22 +219,29 @@ def render_noto_figure(svg_path: Path, v: V,
         arr[:, :bx, 3] = 0
         arr[:, rw - bx:, 3] = 0
 
-        # ② Noto コーナーインデックス消去（Notoコーナー全域 ≈ 36%W×46%H）
+        # ② Noto コーナーインデックス消去（SVG内 36%W×46%H のコーナー矩形）
         cx_px = int(rw * 0.36)
         cy_px = int(rh * 0.46)
         arr[:cy_px, :cx_px, 3] = 0
         arr[rh - cy_px:, rw - cx_px:, 3] = 0
 
-        # ③ 残ピクセルをスート sline カラーに着色（fitz 描画は純黒なのでアルファのみ判定）
+        # ③ 残ピクセルをスート sline カラーに着色
         pip_r, pip_g, pip_b = v.sline[:3]
         dark_mask = arr[:, :, 3] > 10
         arr[dark_mask, 0] = pip_r
         arr[dark_mask, 1] = pip_g
         arr[dark_mask, 2] = pip_b
-        # アルファは元のまま（エッジのアンチエイリアスを保持）
 
         result = Image.fromarray(arr, 'RGBA')
-        result = result.resize((out_w, out_h), Image.LANCZOS)
+        result = result.resize((render_w, render_h), Image.LANCZOS)
+
+        # ④ クロップ: コーナー余白が _NOTO_CORNER_W × _NOTO_CORNER_H になるよう offset
+        cx_face = int(render_w * 0.36)
+        cy_face = int(render_h * 0.46)
+        ox = max(0, cx_face - _NOTO_CORNER_W)
+        oy = max(0, cy_face - _NOTO_CORNER_H)
+        result = result.crop((ox, oy, ox + out_w, oy + out_h))
+
         return result
     except Exception as e:
         print(f"  noto_figure error for {svg_path.name}: {e}", file=sys.stderr)
@@ -439,7 +454,9 @@ FACE_Y      = CY1  # = 3
 def draw_face_card(img: Image.Image, draw: ImageDraw.ImageDraw,
                    rank: str, suit: str, v: V):
     """Noto SVGから人物図柄を抽出・着色して配置。利用不可の場合はフォールバック。"""
-    svg_name = f"PLAYING CARD {RANK_NAME[rank]} OF {SUIT_NAME[suit]}.svg"
+    # HEARTS KNIGHT: 頭部が破綻するため CLUBS KNIGHT SVG を代替流用（着色はHeartsのまま）
+    figure_suit = 'C' if (rank == 'C' and suit == 'H') else suit
+    svg_name = f"PLAYING CARD {RANK_NAME[rank]} OF {SUIT_NAME[figure_suit]}.svg"
     svg_path = get_noto_path(svg_name)
 
     noto_img = render_noto_figure(svg_path, v, FACE_AREA_W, FACE_AREA_H)
