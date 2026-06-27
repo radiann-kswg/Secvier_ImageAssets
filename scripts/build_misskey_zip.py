@@ -169,6 +169,39 @@ def _collect_suits() -> list[tuple[Path, str, dict]]:
     return entries
 
 
+def _collect_mahjong() -> list[tuple[Path, str, dict]]:
+    """dist/mahjong/misskey/mj_*.png のエントリを収集する。"""
+    entries: list[tuple[Path, str, dict]] = []
+    src_dir = DIST / "mahjong" / "misskey"
+    suitjp = {"man": "萬子", "pin": "筒子", "sou": "索子"}
+    cat = "Secvier/05.麻雀牌"
+    for png in sorted(src_dir.glob("mj_*.png")):
+        stem = png.stem
+        name = f"sv_{stem}"
+        zip_name = f"{name}.png"
+        parts = stem.split("_")
+        kind = parts[1]
+        if kind in suitjp:
+            n = parts[2]
+            if len(parts) >= 4 and parts[3] == "red":
+                category = cat + "/赤ドラ"
+                aliases = ["akadora", "red5", "赤ドラ", kind, n]
+            else:
+                category = cat + "/" + suitjp[kind]
+                aliases = [n, kind, suitjp[kind]]
+        elif kind == "char":
+            category = cat + "/字牌"
+            aliases = [parts[2], "honor"]
+        elif kind == "season":
+            category = cat + "/季節牌"
+            aliases = [parts[2], "season"]
+        else:
+            category = cat
+            aliases = [stem]
+        entries.append((png, zip_name, _make_entry(zip_name, name, category, aliases)))
+    return entries
+
+
 def main() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -177,6 +210,7 @@ def main() -> None:
     all_entries += _collect_alphanum()
     all_entries += _collect_dice()
     all_entries += _collect_suits()
+    all_entries += _collect_mahjong()
 
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     zip_path = OUTPUT_DIR / f"secvier-misskey-{timestamp}.zip"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 504" width="360" height="504">
+  <title>Secvier mahjong dragon chun (G/B)</title>
+  <desc>RadianN_kswg / ラジアン（柏木主税） CC BY 4.0</desc>
+  <rect x="5" y="5" width="350" height="494" rx="32" fill="#FAFAFA" stroke="#AFAFAF" stroke-width="9"/><rect x="20" y="20" width="320" height="464" rx="22" fill="none" stroke="#CFCFCF" stroke-width="4"/>
+  <g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,75.776,384.000)">
+    <path d="M579.0 525.0V612.5L491.5 700.0H141.5L54.0 612.5V87.5L141.5 0.0H666.5V350.0L579.0 437.5H404.0V350.0L491.5 262.5V175.0H229.0V525.0Z" fill="#B81430"/>
+  </g></g><g transform="rotate(180,180.0,252.0)"><g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,71.424,384.000)">
+    <path d="M672.5 612.5 585.0 700.0H60.0V0.0H585.0L672.5 87.5V262.5L585.0 350.0L672.5 437.5ZM235.0 175.0V262.5H410.0L497.5 175.0ZM410.0 437.5H235.0V525.0H497.5Z" fill="#B81430"/>
+  </g></g></g><g fill="#B81430"><svg xmlns:xlink="http://www.w3.org/1999/xlink" x="76.00" y="150.00" width="208.00" height="208.00" viewBox="0 0 1000 1000"><title>Dela Gothic One 中 (chun)</title>
+  <g transform="translate(38.462,860.462) scale(0.92308,-0.92308)"><path d="M618 772V650H955V165H733V185H618V9H382V185H268V165H45V650H382V772ZM268 456V380H382V456ZM618 456V380H733V456Z"/></g></svg></g>
+</svg>

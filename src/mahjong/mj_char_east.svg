@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 504" width="360" height="504">
+  <title>Secvier mahjong wind east (E)</title>
+  <desc>RadianN_kswg / ラジアン（柏木主税） CC BY 4.0</desc>
+  <rect x="5" y="5" width="350" height="494" rx="32" fill="#FAFAFA" stroke="#AFAFAF" stroke-width="9"/><rect x="20" y="20" width="320" height="464" rx="22" fill="none" stroke="#CFCFCF" stroke-width="4"/>
+  <g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,81.408,384.000)">
+    <path d="M235.0 175.0V262.5H497.5V350.0L410.0 437.5H235.0V525.0H497.5L585.0 612.5V700.0H60.0V0.0H672.5V87.5L585.0 175.0Z" fill="#26346F"/>
+  </g></g><g transform="rotate(180,180.0,252.0)"><g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,81.408,384.000)">
+    <path d="M235.0 175.0V262.5H497.5V350.0L410.0 437.5H235.0V525.0H497.5L585.0 612.5V700.0H60.0V0.0H672.5V87.5L585.0 175.0Z" fill="#26346F"/>
+  </g></g></g><g fill="#26346F"><svg xmlns:xlink="http://www.w3.org/1999/xlink" x="76.00" y="150.00" width="208.00" height="208.00" viewBox="0 0 1000 1000"><title>Dela Gothic One 東 (east)</title>
+  <g transform="translate(77.465,820.282) scale(0.84507,-0.84507)"><path d="M903 -7Q832 9 750.0 39.5Q668 70 604 109V-9H396V109Q330 70 248.0 39.0Q166 8 97 -7Q80 52 58.5 98.0Q37 144 3 189Q107 189 201.5 199.0Q296 209 367 225H70V573H396V594H33V730H396V767H604V730H967V594H604V573H930V225H633Q704 209 798.5 199.0Q893 189 997 189Q963 144 941.5 98.0Q920 52 903 -7ZM396 442V464H273V442ZM727 442V464H604V442ZM396 359H273V337H396ZM604 359V337H727V359Z"/></g></svg></g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 504" width="360" height="504">
+  <title>Secvier mahjong wind west (W)</title>
+  <desc>RadianN_kswg / ラジアン（柏木主税） CC BY 4.0</desc>
+  <rect x="5" y="5" width="350" height="494" rx="32" fill="#FAFAFA" stroke="#AFAFAF" stroke-width="9"/><rect x="20" y="20" width="320" height="464" rx="22" fill="none" stroke="#CFCFCF" stroke-width="4"/>
+  <g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,46.080,384.000)">
+    <path d="M322.5 0.0 410.0 87.5 497.5 0.0H760.0V700.0H585.0V175.0L410.0 350.0L235.0 175.0V700.0H60.0V0.0Z" fill="#26346F"/>
+  </g></g><g transform="rotate(180,180.0,252.0)"><g transform="translate(259.00,55.00) scale(0.1602,0.1602)"><g transform="matrix(0.512000,0,0,-0.512000,46.080,384.000)">
+    <path d="M322.5 0.0 410.0 87.5 497.5 0.0H760.0V700.0H585.0V175.0L410.0 350.0L235.0 175.0V700.0H60.0V0.0Z" fill="#26346F"/>
+  </g></g></g><g fill="#26346F"><svg xmlns:xlink="http://www.w3.org/1999/xlink" x="76.00" y="150.00" width="208.00" height="208.00" viewBox="0 0 1000 1000"><title>Dela Gothic One 西 (west)</title>
+  <g transform="translate(37.445,845.991) scale(0.92511,-0.92511)"><path d="M954 752V592H698V563H954V-4H750V7H260V-4H46V563H290V592H46V752ZM513 563V592H486Q486 572 485 563ZM260 402V280Q277 294 287 313Q298 334 302.0 348.5Q306 363 308 402ZM260 186H750V212Q739 210 719 210H585Q543 210 528.0 224.0Q513 238 513 271V402H481Q478 339 472.0 308.0Q466 277 453 253Q432 215 409 192Q324 231 260 244ZM750 402H678V354Q678 351 681.0 349.0Q684 347 689 347Q695 347 699.5 350.5Q704 354 704 362V372Q704 385 702 395Q722 387 750 378Z"/></g></svg></g>
+</svg>
