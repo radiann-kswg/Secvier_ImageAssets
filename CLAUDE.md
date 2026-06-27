@@ -20,6 +20,9 @@
 | `scripts/generate_all_v3.py`         | ダイス・英数字（全5バリアント）               | `dist/dice/`, `dist/alphanum/`                 |
 | `scripts/generate_dualmode.py`       | 英数字・スートマーク デュアルモード版         | `dist/alphanum_dualmode/`, `dist/suits_dualmode/` |
 | `scripts/generate_dice_faces.py`     | ダイス出目イラスト                            | `dist/dice/`                                   |
+| `scripts/extract_dela_kanji.py`      | Dela Gothic One から字牌・季節牌の漢字SVG抽出 | `src/noto_mahjong/`                            |
+| `scripts/generate_mahjong_proto.py`  | 麻雀牌 SVGソース生成（牌本体 + parts/）       | `src/mahjong/`                                 |
+| `scripts/generate_mahjong_emoji.py`  | 麻雀牌 Discord/Misskey向けPNG生成（41枚）     | `dist/mahjong/discord/`, `dist/mahjong/misskey/` |
 | `scripts/build_misskey_zip.py`       | Misskey一括インポートzip生成                  | `_exported-dist/secvier-misskey-{timestamp}.zip` |
 
 ### スクリプト実行順序
@@ -40,11 +43,16 @@ python scripts/generate_dualmode.py
 # ダイス・英数字生成（全バリアント）
 python scripts/generate_all_v3.py
 
+# 麻雀牌生成（SVGソース → Discord/Misskey向けPNG）
+python scripts/extract_dela_kanji.py      # 字牌・季節牌の漢字SVG抽出（初回・フォント更新時）
+python scripts/generate_mahjong_proto.py  # 牌SVGソース生成 → src/mahjong/
+python scripts/generate_mahjong_emoji.py  # PNG生成 → dist/mahjong/{discord,misskey}/
+
 # 全カテゴリ一括ビルド（dry-run確認 → 実行）
 python scripts/build.py --dry-run
 python scripts/build.py
 
-# Misskey一括インポートzip生成
+# Misskey一括インポートzip生成（麻雀牌を含む全カテゴリ）
 python scripts/build_misskey_zip.py
 ```
 
@@ -56,6 +64,13 @@ python scripts/build_misskey_zip.py
   `generate_cards_dualmode.py` の `render_noto_figure()` が PyMuPDF で読み込む。
 - `dist/alphanum_dualmode/` — 6バリアント（seiyuu/suigyoku/kougyoku/hakuji/kokuji/sakin）×
   36字 の透過PNG。`kokuji`（黒磁）は hakuji の色反転で、暗背景に映えるバリアント。
+- `src/mahjong/` — 麻雀牌 SVGソース。`generate_mahjong_proto.py` が生成・更新する。
+  `parts/` に筒子コイン・索子竹・字牌文字などの最小部品SVGを格納。
+- `src/ext_mahjong/` — 外部素材（CC0/CC BY 4.0）。一索の鳥（CC0）と季節牌の花絵柄（CC BY 4.0）。
+  ライセンス詳細は `src/ext_mahjong/CREDITS.md` を参照。**読み取り専用**として扱うこと。
+- `src/noto_mahjong/` — `extract_dela_kanji.py` が抽出した字牌・季節牌の漢字SVGキャッシュ。
+- `assets/fonts/delagothicone/` — Dela Gothic One woff2サブセット（SIL OFL 1.1）。
+  字牌・季節牌の漢字レンダリングに使用。フォントファイルは改変・再頒布禁止。
 - `_exported-dist/` — `build_misskey_zip.py` が出力する zip の格納先（`.gitignore` 対象）。
 
 ### メモリ・コンテキスト管理

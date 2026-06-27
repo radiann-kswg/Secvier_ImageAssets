@@ -20,7 +20,7 @@
 | ダイス         | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント                   |
 | 英数字         | A–Z（大文字） / 0–9（デュアルモード対応）                     | 6バリアント × 36枚            |
 | スートマーク   | ♠♥♦♣ 透過デュアルモード版（各2色）                            | 8種                           |
-| 麻雀牌         | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）       | 実装予定                      |
+| 麻雀牌         | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）+ 季節牌4枚 + 赤ドラ3枚 | 41枚（Discord/Misskey各対応） |
 
 ---
 
@@ -45,7 +45,8 @@ Secvier_ImageAssets/
 │   └── copilot-instructions.md ← GitHub Copilot 向け補足
 ├── assets/
 │   └── fonts/
-│       └── Secvier.otf         ← ビルド参照フォント（_original-fontsのコピー）
+│       ├── Secvier.otf         ← ビルド参照フォント（_original-fontsのコピー）
+│       └── delagothicone/      ← Dela Gothic One サブセット（字牌・季節牌漢字用、SIL OFL 1.1）
 ├── src/
 │   ├── alphanum/               ← 英数字 SVGソース（アウトライン化済み）
 │   ├── cards/                  ← トランプ SVGソース（v1 旧実装）
@@ -54,7 +55,10 @@ Secvier_ImageAssets/
 │   ├── noto_cache/             ← Noto SVG キャッシュ（bindfs 回避用）
 │   ├── noto_svg/               ← Noto SVG 補完キャッシュ
 │   ├── dice/                   ← ダイス SVGソース
-│   ├── mahjong/                ← 麻雀牌 SVGソース（予定）
+│   ├── mahjong/                ← 麻雀牌 SVGソース（牌本体 + parts/）
+│   │   └── parts/              ← 筒子コイン・索子竹・字牌文字など最小部品
+│   ├── noto_mahjong/           ← 麻雀牌用 漢字・季節牌 外部SVGアセット
+│   ├── ext_mahjong/            ← 外部素材（CC0/CC BY）: 一索鳥・季節牌花絵柄
 │   └── templates/              ← ベーステンプレートSVG
 ├── dist/
 │   ├── cards/
@@ -64,7 +68,9 @@ Secvier_ImageAssets/
 │   ├── alphanum/{variant}/     ← 英数字 PNG（バリアント別、通常版）
 │   ├── alphanum_dualmode/{variant}/ ← 英数字 PNG（透過デュアルモード版）
 │   ├── suits_dualmode/         ← スートマーク 透過デュアルモード版
-│   └── mahjong/                ← 麻雀牌 PNG（予定）
+│   └── mahjong/
+│       ├── discord/            ← Discord向け 256×256px 麻雀牌 PNG
+│       └── misskey/            ← Misskey向け 256×320px 麻雀牌 PNG
 ├── svg2png/
 │   ├── alphanum/               ← char_{A-Z,0-9}.svg を単純PNG変換したもの
 │   └── suits/                  ← スートマーク SVG の単純PNG変換
@@ -74,6 +80,9 @@ Secvier_ImageAssets/
 │   ├── generate_all_v3.py      ← ダイス・英数字一括生成【現行メイン】
 │   ├── generate_dualmode.py    ← 英数字・スートマーク デュアルモード生成【現行メイン】
 │   ├── generate_dice_faces.py  ← ダイス出目イラスト生成
+│   ├── generate_mahjong_proto.py ← 麻雀牌 SVG生成【現行メイン】
+│   ├── generate_mahjong_emoji.py ← 麻雀牌 Discord/Misskey向けPNG生成【現行メイン】
+│   ├── extract_dela_kanji.py   ← Dela Gothic One から字牌・季節牌漢字を抽出
 │   ├── build_misskey_zip.py    ← Misskey一括インポート用zip生成
 │   ├── inspect_font.py         ← グリフ検査 → docs/glyph_map.txt
 │   ├── extract_glyphs.py       ← フォントアウトライン → src/alphanum/ SVG
@@ -82,7 +91,8 @@ Secvier_ImageAssets/
 │   └── build.py                ← 全カテゴリ一括ビルド
 ├── docs/
 │   ├── glyph_map.txt           ← inspect_font.py が自動生成
-│   └── cards_dualmode_spec.md  ← Discord/Misskey向けトランプ仕様書
+│   ├── cards_dualmode_spec.md  ← Discord/Misskey向けトランプ仕様書
+│   └── mahjong_proto_spec.md   ← 麻雀牌 SVG仕様書（外部素材ライセンスを含む）
 ├── proposals_dualmode/         ← デュアルモード初期デザイン提案（作業履歴）
 ├── proposals_dualmode_v2/      ← デュアルモード v2 デザイン提案（作業履歴）
 ├── _exported-dist/             ← エクスポートzip格納（.gitignore対象）
@@ -109,8 +119,10 @@ Secvier_ImageAssets/
 - **トランプ suit**: `spade` `heart` `diamond` `club` `joker`
 - **トランプ value**: `A` `2`–`10` `J` `Q` `K`（jokerは `black` `red`）
 - **ダイス type**: `d4` `d6` `d8` `d10` `d10tens` `d12` `d20`
-- **麻雀 suit**: `man`（萬子）`pin`（筒子）`sou`（索子）`char`（字牌）
+- **麻雀 suit**: `man`（萬子）`pin`（筒子）`sou`（索子）`char`（字牌）`season`（季節牌）
 - **麻雀 char値**: `east` `south` `west` `north` `chun` `hatsu` `haku`
+- **麻雀 season値**: `spring` `summer` `autumn` `winter`
+- **赤ドラ**: 数牌5の赤ドラは `mj_{man,pin,sou}_5_red.svg` / `_5_red.png`
 
 ---
 
@@ -127,7 +139,11 @@ Secvier_ImageAssets/
   - `svgwrite` — SVGファイル生成補助
   - `click` — CLIインターフェース
 - **フォントファイル**: `assets/fonts/Secvier.otf`
-- **外部アセット**: `src/noto_cards/` — Noto Emoji playing card SVG（Google LLC, SIL OFL 1.1）
+- **外部アセット**:
+  - `src/noto_cards/` — Noto Emoji playing card SVG（Google LLC, SIL OFL 1.1）
+  - `src/ext_mahjong/` — 麻雀牌用外部素材（一索鳥 CC0、季節牌花絵柄 CC BY 4.0）
+  - `src/noto_mahjong/` — 字牌・季節牌 漢字SVGキャッシュ
+  - `assets/fonts/delagothicone/` — Dela Gothic One サブセット（SIL OFL 1.1）
 
 ---
 
@@ -167,6 +183,11 @@ python scripts/generate_cards_dualmode.py
 
 # 英数字・スートマーク デュアルモード生成 → dist/alphanum_dualmode/, dist/suits_dualmode/
 python scripts/generate_dualmode.py
+
+# 麻雀牌生成 → src/mahjong/*.svg（牌SVG） → dist/mahjong/{discord,misskey}/
+python scripts/extract_dela_kanji.py    # 字牌・季節牌の漢字SVG抽出（初回・フォント更新時）
+python scripts/generate_mahjong_proto.py # 牌SVGソース生成
+python scripts/generate_mahjong_emoji.py # Discord/Misskey向けPNG生成
 
 # Misskey一括インポートzip生成 → _exported-dist/secvier-misskey-{timestamp}.zip
 python scripts/build_misskey_zip.py
