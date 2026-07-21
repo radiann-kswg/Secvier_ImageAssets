@@ -1,7 +1,7 @@
 # Secvier Glyph Map
 # Font: Secvier.otf
-# Total glyphs: 43
-# Unicode mapped glyphs: 124
+# Total glyphs: 71
+# Unicode mapped glyphs: 176
 
 ## Unicode → Glyph Name
 
@@ -129,39 +129,117 @@ U+00FC  'ü'     U
 U+00FD  'ý'     Y
 U+00FF  'ÿ'     Y
 U+0178  'Ÿ'     Y
+U+0391  'Α'     Alpha
+U+0392  'Β'     Beta
+U+0393  'Γ'     Gamma
+U+0394  'Δ'     Deltagreek
+U+0395  'Ε'     Epsilon
+U+0396  'Ζ'     Zeta
+U+0397  'Η'     Eta
+U+0398  'Θ'     Theta
+U+0399  'Ι'     Iota
+U+039A  'Κ'     Kappa
+U+039B  'Λ'     Lambda
+U+039C  'Μ'     Mu
+U+039D  'Ν'     Nu
+U+039E  'Ξ'     Xi
+U+039F  'Ο'     Omicron
+U+03A0  'Π'     Pi
+U+03A1  'Ρ'     Rho
+U+03A3  'Σ'     Sigma
+U+03A4  'Τ'     Tau
+U+03A5  'Υ'     Upsilon
+U+03A6  'Φ'     Phi
+U+03A7  'Χ'     Chi
+U+03A8  'Ψ'     Psi
+U+03A9  'Ω'     Omegagreek
+U+03B1  'α'     Alpha
+U+03B2  'β'     Beta
+U+03B3  'γ'     Gamma
+U+03B4  'δ'     Deltagreek
+U+03B5  'ε'     Epsilon
+U+03B6  'ζ'     Zeta
+U+03B7  'η'     Eta
+U+03B8  'θ'     Theta
+U+03B9  'ι'     Iota
+U+03BA  'κ'     Kappa
+U+03BB  'λ'     Lambda
+U+03BC  'μ'     Mu
+U+03BD  'ν'     Nu
+U+03BE  'ξ'     Xi
+U+03BF  'ο'     Omicron
+U+03C0  'π'     Pi
+U+03C1  'ρ'     Rho
+U+03C3  'σ'     Sigma
+U+03C4  'τ'     Tau
+U+03C5  'υ'     Upsilon
+U+03C6  'φ'     Phi
+U+03C7  'χ'     Chi
+U+03C8  'ψ'     Psi
+U+03C9  'ω'     Omegagreek
+U+2660  '♠'     spade
+U+2663  '♣'     club
+U+2665  '♥'     uni2665
+U+2666  '♦'     diamond
 
 ## All Glyph Names
 
   .notdef
   .null
   A
+  Alpha
   B
+  Beta
   C
+  Chi
   D
+  Deltagreek
   E
+  Epsilon
+  Eta
   F
   G
+  Gamma
   H
   I
+  Iota
   J
   K
+  Kappa
   L
+  Lambda
   M
+  Mu
   N
+  Nu
   O
+  Omegagreek
+  Omicron
   P
+  Phi
+  Pi
+  Psi
   Q
   R
+  Rho
   S
+  Sigma
   T
+  Tau
+  Theta
   U
+  Upsilon
   V
   W
   X
+  Xi
   Y
   Z
+  Zeta
+  club
   controlCR
   controlLF
+  diamond
   eight
   five
   four
@@ -172,6 +250,8 @@ U+0178  'Ÿ'     Y
   six
   softhyphen
   space
+  spade
   three
   two
+  uni2665
   zero
