@@ -48,6 +48,12 @@
 A–Z（大文字）/ 0–9 の Secvier フォントグリフを絵文字化。各バリアント 36枚。
 ライト/ダーク両モード対応の透過PNG（`dist/alphanum_dualmode/`）と、通常版（`dist/alphanum/`）を提供します。
 
+### ギリシャ文字（6バリアント × 24文字）
+
+Α–Ω（ギリシャ大文字）の Secvier フォントグリフを絵文字化（Secvier v0.1-beta で追加）。各バリアント 24枚。
+英数字と同一の宝石スタイルで、透過デュアルモード版（`dist/alphanum_greek_dualmode/`）と
+枠付き通常版（`dist/alphanum_greek/`）を提供します。詳細は [docs/greek_alphanum_spec.md](docs/greek_alphanum_spec.md)。
+
 ### 麻雀牌（41枚 × 2プラットフォーム）
 
 萬子・筒子・索子の数牌、字牌（東南西北中發白）、季節牌（春夏秋冬）、赤ドラを収録。
@@ -77,12 +83,12 @@ A–Z（大文字）/ 0–9 の Secvier フォントグリフを絵文字化。�
 
 | キー       | 名称 | テーマ                   | 対応カテゴリ              |
 | ---------- | ---- | ------------------------ | ------------------------- |
-| `seiyuu`   | 星幽 | 深夜紺×薄紫 — 宇宙・星幽 | トランプ♠ / ダイス / 英数字 |
-| `suigyoku` | 翠玉 | 深翠×翠緑 — エメラルド   | トランプ♣ / ダイス / 英数字 |
-| `kougyoku` | 紅玉 | 深紅×紅 — ルビー         | トランプ♥ / ダイス / 英数字 |
-| `hakuji`   | 白磁 | 白磁×金茶 — 磁器・和風   | ダイス / 英数字            |
-| `kokuji`   | 黒磁 | 黒×金縁 — 白磁の色反転   | 英数字（デュアルモード専用）|
-| `sakin`    | 砂金 | 黄金×金 — 砂金・羊皮紙   | トランプ♦ / ダイス / 英数字 |
+| `seiyuu`   | 星幽 | 深夜紺×薄紫 — 宇宙・星幽 | トランプ♠ / ダイス / 英数字 / ギリシャ文字 |
+| `suigyoku` | 翠玉 | 深翠×翠緑 — エメラルド   | トランプ♣ / ダイス / 英数字 / ギリシャ文字 |
+| `kougyoku` | 紅玉 | 深紅×紅 — ルビー         | トランプ♥ / ダイス / 英数字 / ギリシャ文字 |
+| `hakuji`   | 白磁 | 白磁×金茶 — 磁器・和風   | ダイス / 英数字 / ギリシャ文字            |
+| `kokuji`   | 黒磁 | 黒×金縁 — 白磁の色反転   | 英数字 / ギリシャ文字（デュアルモード専用）|
+| `sakin`    | 砂金 | 黄金×金 — 砂金・羊皮紙   | トランプ♦ / ダイス / 英数字 / ギリシャ文字 |
 
 ---
 
@@ -96,8 +102,9 @@ Secvier_ImageAssets/
 │       └── delagothicone/           # Dela Gothic One サブセット（字牌・季節牌漢字用）
 ├── src/
 │   ├── alphanum/                    # 英数字 SVG（アウトライン化済み）
+│   ├── alphanum_greek/              # ギリシャ大文字 SVG（Α–Ω, アウトライン化済み）
 │   ├── cards/                       # トランプ SVG（v1 旧実装）
-│   ├── suits/                       # スートマーク SVG
+│   ├── suits/                       # スートマーク SVG（フォント収録グリフ由来）
 │   ├── noto_cards/                  # Noto Emoji コートカード SVG（原本）
 │   ├── noto_cache/                  # Noto SVG キャッシュ
 │   ├── noto_svg/                    # Noto SVG 補完キャッシュ
@@ -113,22 +120,26 @@ Secvier_ImageAssets/
 │   │   └── misskey/                 # Misskey向け 256×320px トランプ PNG
 │   ├── dice/{variant}/              # ダイス PNG（バリアント別）
 │   ├── alphanum/{variant}/          # 英数字 PNG（通常版）
+│   ├── alphanum_greek/{variant}/    # ギリシャ大文字 PNG（枠付き通常版）
 │   ├── alphanum_dualmode/{variant}/ # 英数字 PNG（透過デュアルモード）
+│   ├── alphanum_greek_dualmode/{variant}/ # ギリシャ大文字 PNG（透過デュアルモード）
 │   ├── suits_dualmode/              # スートマーク 透過デュアルモード
 │   └── mahjong/
 │       ├── discord/                 # Discord向け 256×256px 麻雀牌 PNG
 │       └── misskey/                 # Misskey向け 256×320px 麻雀牌 PNG
 ├── scripts/
 │   ├── generate_cards_dualmode.py   # Discord/Misskey向けトランプ生成（現行）
-│   ├── generate_dualmode.py         # 英数字・スートマーク デュアルモード生成（現行）
-│   ├── generate_all_v3.py           # ダイス・英数字一括生成
+│   ├── generate_dualmode.py         # 英数字・ギリシャ文字・スートマーク デュアルモード生成（現行）
+│   ├── generate_all_v3.py           # ダイス・英数字・ギリシャ文字一括生成
 │   ├── generate_dice_faces.py       # ダイス出目イラスト生成
 │   ├── generate_mahjong_proto.py    # 麻雀牌 SVGソース生成（現行）
 │   ├── generate_mahjong_emoji.py    # 麻雀牌 Discord/Misskey向けPNG生成（現行）
 │   ├── extract_dela_kanji.py        # Dela Gothic One から漢字SVG抽出
 │   ├── build_misskey_zip.py         # Misskey一括インポートzip生成
 │   ├── inspect_font.py              # フォントグリフ検査
-│   ├── extract_glyphs.py            # Secvier → SVGアウトライン抽出
+│   ├── extract_glyphs.py            # Secvier → SVGアウトライン抽出（--charset latin/greek）
+│   ├── extract_suits.py             # フォント収録スート → SVG（天地中央）
+│   ├── render_svg2png.py            # src SVG → svg2png/ 黒字白背景マスクPNG
 │   ├── build.py                     # 全カテゴリ一括ビルド
 │   ├── export_png.py                # SVG → PNG 変換
 │   └── render_svg.py                # SVG合成ユーティリティ
@@ -166,14 +177,22 @@ pip install -r requirements.txt
 python scripts/generate_cards_dualmode.py
 ```
 
-### ダイス・英数字の生成
+### ダイス・英数字・ギリシャ文字の生成
 
 ```bash
-# ダイス・英数字 全バリアント生成
+# グリフSVG抽出（Secvier v0.1-beta のフォントを起点に）
+python scripts/extract_glyphs.py                  # 英数字 → src/alphanum/
+python scripts/extract_glyphs.py --charset greek  # ギリシャ大文字 → src/alphanum_greek/
+python scripts/extract_suits.py                   # スート ♠♣♥♦ → src/suits/
+
+# 黒字白背景マスクPNG生成（デュアルモードの土台） → svg2png/
+python scripts/render_svg2png.py
+
+# ダイス・英数字・ギリシャ文字 全バリアント生成（枠付き通常版）
 python scripts/generate_all_v3.py
 
-# 英数字・スートマーク デュアルモード生成（透過PNG）
-# → dist/alphanum_dualmode/, dist/suits_dualmode/
+# 英数字・ギリシャ文字・スートマーク デュアルモード生成（透過PNG）
+# → dist/alphanum_dualmode/, dist/alphanum_greek_dualmode/, dist/suits_dualmode/
 python scripts/generate_dualmode.py
 
 # 一括ビルド（dry-run確認）
@@ -200,7 +219,8 @@ python scripts/generate_mahjong_emoji.py
 
 ```bash
 # Misskey用zip生成 → _exported-dist/secvier-misskey-{timestamp}.zip
-# 収録: トランプ(62) + 英数字デュアルモード(216) + ダイス(399) + スートマーク(8) + 麻雀牌(41) = 726絵文字
+# 収録: トランプ(62) + 英数字デュアルモード(216) + ギリシャ文字デュアルモード(144)
+#       + ダイス(399) + スートマーク(8) + 麻雀牌(41) = 870絵文字
 python scripts/build_misskey_zip.py
 ```
 
@@ -213,8 +233,8 @@ python scripts/build_misskey_zip.py
 | フォーマット                     | PNG（RGBA）                       |
 | トランプ（Discord）              | 256 × 256 px（カード部: 205×256） |
 | トランプ（Misskey）              | 256 × 320 px                      |
-| ダイス・英数字（通常版）         | 128 × 128 px                      |
-| 英数字・スートマーク（dualmode） | 128 × 128 px / 512 × 512 px       |
+| ダイス・英数字・ギリシャ（通常版）| 128 × 128 px                      |
+| 英数字・ギリシャ・スート（dualmode）| 128 × 128 px / 512 × 512 px     |
 | 麻雀牌（Discord）                | 256 × 256 px                      |
 | 麻雀牌（Misskey）                | 256 × 320 px                      |
 | 麻雀牌 SVGキャンバス             | 360 × 504 px（比率 5:7）          |

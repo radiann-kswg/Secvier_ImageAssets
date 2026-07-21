@@ -17,8 +17,10 @@
 | ------------------------------------ | --------------------------------------------- | ---------------------------------------------- |
 | `scripts/generate_cards_v2.py`       | トランプ 62枚（スート別バリアント + Noto コートカード） | `dist/cards/`（旧フォーマット）      |
 | `scripts/generate_cards_dualmode.py` | トランプ Discord/Misskey向け各62枚            | `dist/cards/discord/`, `dist/cards/misskey/`   |
-| `scripts/generate_all_v3.py`         | ダイス・英数字（全5バリアント）               | `dist/dice/`, `dist/alphanum/`                 |
-| `scripts/generate_dualmode.py`       | 英数字・スートマーク デュアルモード版         | `dist/alphanum_dualmode/`, `dist/suits_dualmode/` |
+| `scripts/generate_all_v3.py`         | ダイス・英数字・ギリシャ文字（全5バリアント枠付き） | `dist/dice/`, `dist/alphanum/`, `dist/alphanum_greek/` |
+| `scripts/generate_dualmode.py`       | 英数字・ギリシャ文字・スートマーク デュアルモード版 | `dist/alphanum_dualmode/`, `dist/alphanum_greek_dualmode/`, `dist/suits_dualmode/` |
+| `scripts/extract_suits.py`           | フォント収録スートグリフ（♠♣♥♦）→ SVG（天地中央） | `src/suits/`                                   |
+| `scripts/render_svg2png.py`          | src SVG → 黒字白背景マスクPNG（英数字/ギリシャ/スート） | `svg2png/{alphanum,alphanum_greek,suits}/`     |
 | `scripts/generate_dice_faces.py`     | ダイス出目イラスト                            | `dist/dice/`                                   |
 | `scripts/extract_dela_kanji.py`      | Dela Gothic One から字牌・季節牌の漢字SVG抽出 | `src/noto_mahjong/`                            |
 | `scripts/generate_mahjong_proto.py`  | 麻雀牌 SVGソース生成（牌本体 + parts/）       | `src/mahjong/`                                 |
@@ -34,10 +36,19 @@ python scripts/inspect_font.py
 # 英数字グリフ抽出（アウトライン化SVG → src/alphanum/）
 python scripts/extract_glyphs.py
 
+# ギリシャ大文字抽出（Α–Ω → src/alphanum_greek/）※Secvier v0.1-beta 収録
+python scripts/extract_glyphs.py --charset greek
+
+# フォント収録スート抽出（♠♣♥♦ → src/suits/, 天地中央）※Secvier v0.1-beta 収録
+python scripts/extract_suits.py
+
+# 黒字白背景マスクPNG生成（src SVG → svg2png/）※デュアルモードの土台
+python scripts/render_svg2png.py
+
 # トランプ絵文字生成（Discord/Misskey向け, Noto Emoji SVGが src/noto_cards/ に必要）
 python scripts/generate_cards_dualmode.py
 
-# 英数字・スートマーク デュアルモード生成（ライト/ダーク両対応 透過PNG）
+# 英数字・ギリシャ文字・スートマーク デュアルモード生成（ライト/ダーク両対応 透過PNG）
 python scripts/generate_dualmode.py
 
 # ダイス・英数字生成（全バリアント）
@@ -58,8 +69,16 @@ python scripts/build_misskey_zip.py
 
 ### ディレクトリ補足
 
-- `svg2png/` — `src/alphanum/` や `src/suits/` の SVG を装飾なしで単純 PNG 変換したもの。
-  スタイル付き絵文字出力（`dist/`）とは別管理。
+- `svg2png/` — `src/alphanum/` `src/alphanum_greek/` `src/suits/` の SVG を
+  黒字・白背景の装飾なしマスク PNG に変換したもの（`render_svg2png.py` が生成）。
+  `generate_dualmode.py` がアルファマスクとして読み込む土台。スタイル付き絵文字出力（`dist/`）とは別管理。
+- `src/alphanum_greek/` — ギリシャ大文字（Α–Ω）アウトライン化SVG。ファイル名は
+  ローマ字ステム（`char_Alpha.svg` … `char_Omega.svg`）。`extract_glyphs.py --charset greek` が生成。
+- `src/suits/` — スートマークSVG。Secvier v0.1-beta 収録のフォントグリフ（♠♣♥♦）から
+  `extract_suits.py` が天地中央でアウトライン抽出。※トランプ札面のpipは各カード生成
+  スクリプト内蔵の `SUIT_PATHS` を使用（別表現）。
+- `dist/alphanum_greek_dualmode/` — 6バリアント（seiyuu/suigyoku/kougyoku/hakuji/kokuji/sakin）×
+  24字（Α–Ω）の透過PNG。英数字デュアルモードと同一スタイル。
 - `src/noto_cards/` — Noto Emoji の Playing Card SVG 原本（読み取り専用扱い）。
   `generate_cards_dualmode.py` の `render_noto_figure()` が PyMuPDF で読み込む。
 - `dist/alphanum_dualmode/` — 6バリアント（seiyuu/suigyoku/kougyoku/hakuji/kokuji/sakin）×

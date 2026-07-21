@@ -19,7 +19,8 @@
 | トランプ       | ♠♥♦♣ × A,2–10,J,C,Q,K + ジョーカー黒・赤 + スート単体         | 62枚（Discord/Misskey各対応） |
 | ダイス         | D4 / D6(×出目) / D8 / D10(×出目) / D%(テンズテン) / D12 / D20 | 5バリアント                   |
 | 英数字         | A–Z（大文字） / 0–9（デュアルモード対応）                     | 6バリアント × 36枚            |
-| スートマーク   | ♠♥♦♣ 透過デュアルモード版（各2色）                            | 8種                           |
+| ギリシャ文字   | Α–Ω（大文字, デュアルモード対応）※Secvier v0.1-beta で追加    | 6バリアント × 24枚            |
+| スートマーク   | ♠♥♦♣ 透過デュアルモード版（各2色）※フォント収録グリフ由来     | 8種                           |
 | 麻雀牌         | 萬子1–9 / 筒子1–9 / 索子1–9 / 字牌7枚（東南西北中發白）+ 季節牌4枚 + 赤ドラ3枚 | 41枚（Discord/Misskey各対応） |
 
 ---
@@ -49,8 +50,9 @@ Secvier_ImageAssets/
 │       └── delagothicone/      ← Dela Gothic One サブセット（字牌・季節牌漢字用、SIL OFL 1.1）
 ├── src/
 │   ├── alphanum/               ← 英数字 SVGソース（アウトライン化済み）
+│   ├── alphanum_greek/         ← ギリシャ大文字 SVGソース（Α–Ω, アウトライン化済み）
 │   ├── cards/                  ← トランプ SVGソース（v1 旧実装）
-│   ├── suits/                  ← スートマーク SVG
+│   ├── suits/                  ← スートマーク SVG（フォント収録グリフ由来, 天地中央）
 │   ├── noto_cards/             ← Noto Emoji コートカード SVG（原本、読み取り専用）
 │   ├── noto_cache/             ← Noto SVG キャッシュ（bindfs 回避用）
 │   ├── noto_svg/               ← Noto SVG 補完キャッシュ
@@ -66,13 +68,16 @@ Secvier_ImageAssets/
 │   │   └── misskey/            ← Misskey向け 256×320px トランプ PNG
 │   ├── dice/{variant}/         ← ダイス PNG（バリアント別サブディレクトリ）
 │   ├── alphanum/{variant}/     ← 英数字 PNG（バリアント別、通常版）
+│   ├── alphanum_greek/{variant}/ ← ギリシャ大文字 PNG（バリアント別、枠付き通常版）
 │   ├── alphanum_dualmode/{variant}/ ← 英数字 PNG（透過デュアルモード版）
+│   ├── alphanum_greek_dualmode/{variant}/ ← ギリシャ大文字 PNG（透過デュアルモード版）
 │   ├── suits_dualmode/         ← スートマーク 透過デュアルモード版
 │   └── mahjong/
 │       ├── discord/            ← Discord向け 256×256px 麻雀牌 PNG
 │       └── misskey/            ← Misskey向け 256×320px 麻雀牌 PNG
-├── svg2png/
+├── svg2png/                    ← 黒字・白背景マスクPNG（render_svg2png.py が生成）
 │   ├── alphanum/               ← char_{A-Z,0-9}.svg を単純PNG変換したもの
+│   ├── alphanum_greek/         ← char_{Alpha–Omega}.svg を単純PNG変換したもの
 │   └── suits/                  ← スートマーク SVG の単純PNG変換
 ├── scripts/
 │   ├── generate_cards_v2.py    ← トランプ絵文字生成【現行メイン】
@@ -85,7 +90,9 @@ Secvier_ImageAssets/
 │   ├── extract_dela_kanji.py   ← Dela Gothic One から字牌・季節牌漢字を抽出
 │   ├── build_misskey_zip.py    ← Misskey一括インポート用zip生成
 │   ├── inspect_font.py         ← グリフ検査 → docs/glyph_map.txt
-│   ├── extract_glyphs.py       ← フォントアウトライン → src/alphanum/ SVG
+│   ├── extract_glyphs.py       ← フォントアウトライン → src/alphanum/・alphanum_greek/ SVG（--charset）
+│   ├── extract_suits.py        ← フォント収録スートグリフ → src/suits/ SVG（天地中央）
+│   ├── render_svg2png.py       ← src SVG → svg2png/ 黒字白背景マスクPNG
 │   ├── render_svg.py           ← SVG合成ユーティリティ
 │   ├── export_png.py           ← SVG → PNG変換
 │   └── build.py                ← 全カテゴリ一括ビルド
@@ -172,8 +179,11 @@ Secvier.otf
 
 ```bash
 pip install -r requirements.txt             # 初回セットアップ
-python scripts/inspect_font.py              # フォント検査
-python scripts/extract_glyphs.py            # 英数字グリフSVG抽出
+python scripts/inspect_font.py              # フォント検査 → docs/glyph_map.txt
+python scripts/extract_glyphs.py            # 英数字グリフSVG抽出 → src/alphanum/
+python scripts/extract_glyphs.py --charset greek  # ギリシャ大文字SVG抽出 → src/alphanum_greek/
+python scripts/extract_suits.py             # フォント収録スートSVG抽出 → src/suits/
+python scripts/render_svg2png.py            # src SVG → svg2png/ 黒字マスクPNG（全カテゴリ）
 python scripts/build.py                     # 全カテゴリビルド
 python scripts/build.py --category cards    # カテゴリ指定
 python scripts/build.py --dry-run           # 実行確認（ファイル生成なし）
@@ -181,7 +191,8 @@ python scripts/build.py --dry-run           # 実行確認（ファイル生成�
 # Discord/Misskey向けトランプ生成 → dist/cards/discord/, dist/cards/misskey/
 python scripts/generate_cards_dualmode.py
 
-# 英数字・スートマーク デュアルモード生成 → dist/alphanum_dualmode/, dist/suits_dualmode/
+# 英数字・ギリシャ文字・スートマーク デュアルモード生成
+#   → dist/alphanum_dualmode/, dist/alphanum_greek_dualmode/, dist/suits_dualmode/
 python scripts/generate_dualmode.py
 
 # 麻雀牌生成 → src/mahjong/*.svg（牌SVG） → dist/mahjong/{discord,misskey}/
@@ -253,19 +264,28 @@ docs: update AGENTS.md with unified agent instructions
 
 ---
 
-## Secvier v0.0-alpha 収録グリフ（確認済み）
+## Secvier v0.1-beta 収録グリフ（確認済み）
 
 ```
-グリフ総数: 43  /  Unicodeマッピング: 124
+グリフ総数: 71  /  Unicodeマッピング: 176
 実質収録:   A–Z（大文字、小文字も同グリフにマップ） / 0–9
+            Α–Ω（ギリシャ大文字, U+0391–U+03A9） ※v0.1-betaで追加
+            ♠ U+2660 / ♣ U+2663 / ♥ U+2665 / ♦ U+2666（トランプスート） ※v0.1-betaで追加
+            ラテン拡張（アクセント付き, A–Z ベースグリフへマップ）
 ```
 
-| カテゴリ | フォントグリフ利用                                   | 制作アプローチ                       |
-| -------- | ---------------------------------------------------- | ------------------------------------ |
-| 英数字   | ✅ A–Z / 0–9 直接使用                                | `extract_glyphs.py` でアウトライン化 |
-| トランプ | ✅ 値文字（A/J/Q/K/2–10）はフォント、スートはSVG図形 | `render_svg.py` で合成               |
-| ダイス   | ❌ グリフなし                                        | SVGで面ごとにデザイン                |
-| 麻雀牌   | ❌ グリフなし                                        | SVGで牌ごとにデザイン                |
+| カテゴリ     | フォントグリフ利用                                   | 制作アプローチ                                |
+| ------------ | ---------------------------------------------------- | --------------------------------------------- |
+| 英数字       | ✅ A–Z / 0–9 直接使用                                | `extract_glyphs.py` でアウトライン化          |
+| ギリシャ文字 | ✅ Α–Ω 直接使用（v0.1-beta）                         | `extract_glyphs.py --charset greek`           |
+| スートマーク | ✅ ♠♣♥♦ 直接使用（v0.1-beta）                        | `extract_suits.py`（天地中央でアウトライン化）|
+| トランプ札面 | ✅ 値文字（A/J/Q/K/2–10）はフォント、pipは内蔵SVGパス | `generate_cards_dualmode.py` で合成           |
+| ダイス       | 数字のみフォント（面デザインはSVG）                  | SVGで面ごとにデザイン                         |
+| 麻雀牌       | ❌ グリフなし                                        | SVG + Dela Gothic One 漢字で牌ごとにデザイン  |
+
+> 補足: トランプ**札面**のスートpipは各カード生成スクリプト内蔵の `SUIT_PATHS`
+> （札レイアウトに最適化された72単位パス）を引き続き使用する。フォント収録スートは
+> **独立スートマーク**（`dist/suits_dualmode/`, 03.スートマーク）に適用される。
 
 フォントが更新されたら `python scripts/inspect_font.py` を再実行し
 `docs/glyph_map.txt` で差分を確認すること。
