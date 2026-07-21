@@ -5,8 +5,9 @@ SDF(符号付き距離場)で外ハロー＋内キーライン＋宝石ボディ
 背景を持たない単体グリフでも、縁取りによりライト・ダーク両モードで視認可能。
 
 出力:
-    dist/alphanum_dualmode/{variant}/char_{X}_{size}.png   （A–Z / 0–9 × 6バリアント）
-    dist/suits_dualmode/{suit}_{color}_{size}.png          （♠♥♦♣ × 指定2配色）
+    dist/alphanum_dualmode/{variant}/char_{X}_{size}.png        （A–Z / 0–9 × 6バリアント）
+    dist/alphanum_greek_dualmode/{variant}/char_{Name}_{size}.png（Α–Ω × 6バリアント）
+    dist/suits_dualmode/{suit}_{color}_{size}.png               （♠♥♦♣ × 指定2配色）
 
 著作権者: RadianN_kswg / ラジアン（柏木主税） / ライセンス: CC BY 4.0
 """
@@ -140,6 +141,19 @@ def build_alphanum() -> int:
     return count
 
 
+def build_greek() -> int:
+    """ギリシャ大文字（Α–Ω）を英数字と同じ6バリアントで生成する。"""
+    count = 0
+    sources = sorted((SRC / "alphanum_greek").glob("char_*.png"))
+    for variant, scheme in ALPHANUM.items():
+        out_dir = DIST / "alphanum_greek_dualmode" / variant
+        for src in sources:
+            img = render(load_mask(src), scheme)
+            _save_all_sizes(img, out_dir, src.stem)
+            count += 1
+    return count
+
+
 def build_suits() -> int:
     count = 0
     out_dir = DIST / "suits_dualmode"
@@ -155,9 +169,12 @@ def build_suits() -> int:
 
 def main() -> None:
     a = build_alphanum()
+    g = build_greek()
     s = build_suits()
-    print(f"alphanum: {a} glyph-variants, suits: {s} colorways  (× {len(SIZES)} sizes)")
+    print(f"alphanum: {a} glyph-variants, greek: {g} glyph-variants, "
+          f"suits: {s} colorways  (× {len(SIZES)} sizes)")
     print(f"-> {DIST / 'alphanum_dualmode'}")
+    print(f"-> {DIST / 'alphanum_greek_dualmode'}")
     print(f"-> {DIST / 'suits_dualmode'}")
 
 

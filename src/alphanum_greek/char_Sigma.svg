@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier Sigma</title>
+  <g transform="matrix(0.512000,0,0,-0.512000,83.200,384.000)">
+    <path d="M652.5 612.5V700.0H40.0V612.5L215.0 437.5L40.0 262.5V0.0H652.5V87.5L565.0 175.0H215.0L390.0 350.0V437.5L302.5 525.0H565.0Z" fill="#000000"/>
+  </g>
+</svg>

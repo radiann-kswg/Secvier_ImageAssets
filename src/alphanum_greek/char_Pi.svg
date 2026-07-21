@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier Pi</title>
+  <g transform="matrix(0.512000,0,0,-0.512000,68.096,384.000)">
+    <path d="M717.0 700.0H17.0V612.5L148.25 481.25L104.5 437.5V0.0H279.5V525.0H454.5V0.0H629.5V437.5L585.75 481.25L717.0 612.5Z" fill="#000000"/>
+  </g>
+</svg>

@@ -1,12 +1,16 @@
 """Secvierフォントのグリフをアウトライン化SVGとして抽出する。
 
 fontToolsのSVGPathPenを使い、フォントに依存しない純粋なSVGパス（<path d="...">）を
-src/alphanum/ に出力する。生成SVGは外部フォント参照を一切持たない。
+src/alphanum/（英数字）または src/alphanum_greek/（ギリシャ大文字）に出力する。
+生成SVGは外部フォント参照を一切持たない。
 
-対象グリフ: A–Z / 0–9（Secvier v0.0-alphaが収録する36グリフ）
+対象グリフ:
+    latin: A–Z / 0–9（36グリフ）
+    greek: Α–Ω（ギリシャ大文字24グリフ, Secvier v0.1-beta で収録）
 
 使い方:
-    python scripts/extract_glyphs.py
+    python scripts/extract_glyphs.py                    # 英数字 → src/alphanum/
+    python scripts/extract_glyphs.py --charset greek    # ギリシャ大文字 → src/alphanum_greek/
     python scripts/extract_glyphs.py --viewbox 256
     python scripts/extract_glyphs.py --out-dir src/alphanum
 """
@@ -18,18 +22,37 @@ import click
 from fontTools import ttLib
 from fontTools.pens.svgPathPen import SVGPathPen
 
-FONT_PATH = Path(__file__).parent.parent / "assets" / "fonts" / "Secvier.otf"
-OUT_DIR   = Path(__file__).parent.parent / "src" / "alphanum"
+ROOT      = Path(__file__).parent.parent
+FONT_PATH = ROOT / "assets" / "fonts" / "Secvier.otf"
+OUT_DIR   = ROOT / "src" / "alphanum"
+GREEK_DIR = ROOT / "src" / "alphanum_greek"
 VIEWBOX   = 512
 
 ALPHA_CHARS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 DIGIT_CHARS = list("0123456789")
 ALL_CHARS   = ALPHA_CHARS + DIGIT_CHARS
 
+# ギリシャ大文字（U+0391–U+03A9）。ファイル名はローマ字表記のステムを使う
+# （Α等のマルチバイト文字をファイル名に用いないため）。
+GREEK_UPPER: dict[str, str] = {
+    "Α": "Alpha",   "Β": "Beta",    "Γ": "Gamma",   "Δ": "Delta",
+    "Ε": "Epsilon", "Ζ": "Zeta",    "Η": "Eta",     "Θ": "Theta",
+    "Ι": "Iota",    "Κ": "Kappa",   "Λ": "Lambda",  "Μ": "Mu",
+    "Ν": "Nu",      "Ξ": "Xi",      "Ο": "Omicron", "Π": "Pi",
+    "Ρ": "Rho",     "Σ": "Sigma",   "Τ": "Tau",     "Υ": "Upsilon",
+    "Φ": "Phi",     "Χ": "Chi",     "Ψ": "Psi",     "Ω": "Omega",
+}
 
-def char_to_stem(char: str) -> str:
-    """文字からファイル名ステム（拡張子なし）を生成する。"""
-    return f"char_{char}"
+# charset名 → (対象文字→ステム名 の並び, 既定出力ディレクトリ)
+CHARSETS: dict[str, tuple[list[tuple[str, str]], Path]] = {
+    "latin": ([(ch, ch) for ch in ALL_CHARS], OUT_DIR),
+    "greek": (list(GREEK_UPPER.items()), GREEK_DIR),
+}
+
+
+def char_to_stem(name: str) -> str:
+    """ステム名からファイル名ステム（拡張子なし）を生成する。"""
+    return f"char_{name}"
 
 
 def extract_glyph_svg(
@@ -93,19 +116,24 @@ def extract_glyph_svg(
 
 def extract_all(
     font_path: Path = FONT_PATH,
-    out_dir: Path = OUT_DIR,
+    out_dir: Path | None = None,
     viewbox: int = VIEWBOX,
+    charset: str = "latin",
 ) -> list[Path]:
-    """全対象グリフのアウトライン化SVGを out_dir に出力する。
+    """指定charsetの全対象グリフのアウトライン化SVGを out_dir に出力する。
 
     Args:
         font_path: Secvier OTFファイルのパス
-        out_dir:   出力ディレクトリ
+        out_dir:   出力ディレクトリ（Noneでcharset既定を使用）
         viewbox:   SVG viewBoxサイズ（px）
+        charset:   文字セット（'latin' または 'greek'）
 
     Returns:
         生成したSVGファイルのパスリスト
     """
+    targets, default_dir = CHARSETS[charset]
+    out_dir = out_dir or default_dir
+
     tt = ttLib.TTFont(str(font_path))
     glyph_set    = tt.getGlyphSet()
     cmap         = tt.getBestCmap()
@@ -121,15 +149,15 @@ def extract_all(
     out_dir.mkdir(parents=True, exist_ok=True)
     produced: list[Path] = []
 
-    for char in ALL_CHARS:
+    for char, name in targets:
         codepoint = ord(char)
         if codepoint not in cmap:
             print(f"  SKIP: '{char}' (U+{codepoint:04X}) — cmapに未登録")
             continue
 
         glyph_name = cmap[codepoint]
-        stem  = char_to_stem(char)
-        title = f"Secvier {char}"
+        stem  = char_to_stem(name)
+        title = f"Secvier {name}"
 
         svg = extract_glyph_svg(
             glyph_name, glyph_set, hmtx_metrics,
@@ -156,10 +184,16 @@ def extract_all(
     help="Secvier OTFファイルのパス",
 )
 @click.option(
-    "--out-dir",
-    default=str(OUT_DIR),
+    "--charset",
+    type=click.Choice(list(CHARSETS.keys())),
+    default="latin",
     show_default=True,
-    help="SVG出力ディレクトリ",
+    help="抽出する文字セット（latin=英数字36 / greek=ギリシャ大文字24）",
+)
+@click.option(
+    "--out-dir",
+    default=None,
+    help="SVG出力ディレクトリ（未指定でcharset既定: latin→src/alphanum, greek→src/alphanum_greek）",
 )
 @click.option(
     "--viewbox",
@@ -167,17 +201,18 @@ def extract_all(
     show_default=True,
     help="SVG viewBoxサイズ（px、正方形）",
 )
-def main(font_path: str, out_dir: str, viewbox: int) -> None:
-    """SecvierフォントからA-Z/0-9のアウトライン化SVGを生成します。"""
-    fp  = Path(font_path)
-    od  = Path(out_dir)
+def main(font_path: str, charset: str, out_dir: str | None, viewbox: int) -> None:
+    """Secvierフォントから英数字/ギリシャ大文字のアウトライン化SVGを生成します。"""
+    fp = Path(font_path)
+    od = Path(out_dir) if out_dir else None
 
     print(f"フォント : {fp}")
-    print(f"出力先   : {od}")
+    print(f"文字セット: {charset}")
+    print(f"出力先   : {od or CHARSETS[charset][1]}")
     print(f"viewBox  : {viewbox}x{viewbox}")
     print()
 
-    paths = extract_all(fp, od, viewbox)
+    paths = extract_all(fp, od, viewbox, charset)
 
     print(f"\n完了: {len(paths)} グリフを出力しました")
 

@@ -1,6 +1,7 @@
 """Misskey一括インポート用zipファイルを生成するスクリプト。
 
-dist/cards/misskey/, dist/alphanum_dualmode/, dist/suits_dualmode/, dist/dice/ から
+dist/cards/misskey/, dist/alphanum_dualmode/, dist/alphanum_greek_dualmode/,
+dist/suits_dualmode/, dist/dice/, dist/mahjong/misskey/ から
 Misskey互換 meta.json 付きのzipアーカイブを作成します。
 
 出力: _exported-dist/secvier-misskey-{timestamp}.zip
@@ -153,6 +154,40 @@ def _collect_alphanum() -> list[tuple[Path, str, dict]]:
     return entries
 
 
+# ギリシャ大文字ステム名 → ギリシャ文字（エイリアス用）
+_GREEK_CHAR: dict[str, str] = {
+    "Alpha": "Α", "Beta": "Β", "Gamma": "Γ", "Delta": "Δ", "Epsilon": "Ε",
+    "Zeta": "Ζ", "Eta": "Η", "Theta": "Θ", "Iota": "Ι", "Kappa": "Κ",
+    "Lambda": "Λ", "Mu": "Μ", "Nu": "Ν", "Xi": "Ξ", "Omicron": "Ο",
+    "Pi": "Π", "Rho": "Ρ", "Sigma": "Σ", "Tau": "Τ", "Upsilon": "Υ",
+    "Phi": "Φ", "Chi": "Χ", "Psi": "Ψ", "Omega": "Ω",
+}
+
+
+def _collect_greek() -> list[tuple[Path, str, dict]]:
+    """dist/alphanum_greek_dualmode/{variant}/char_*_128.png のエントリを収集する。"""
+    entries: list[tuple[Path, str, dict]] = []
+    lic = _make_license()
+
+    for variant in sorted(VARIANT_NAMES):
+        variant_dir = DIST / "alphanum_greek_dualmode" / variant
+        if not variant_dir.exists():
+            continue
+        vname = VARIANT_NAMES[variant]
+        category = f"Secvier/06.ギリシャ文字_{vname}"
+
+        for png in sorted(variant_dir.glob("char_*_128.png")):
+            name = png.stem.split("_")[1]  # char_Alpha_128 → Alpha
+            zip_name = f"sv_{variant}_greek_{name}.png"
+            emoji_name = f"sv_{variant}_greek_{name}"
+            aliases = [name, name.lower(), variant, vname]
+            if name in _GREEK_CHAR:
+                aliases.append(_GREEK_CHAR[name])
+            entries.append((png, zip_name, _make_entry(zip_name, emoji_name, category, aliases, lic)))
+
+    return entries
+
+
 def _collect_dice() -> list[tuple[Path, str, dict]]:
     """dist/dice/{variant}/*.png のエントリを収集する。"""
     entries: list[tuple[Path, str, dict]] = []
@@ -269,6 +304,7 @@ def main() -> None:
     all_entries: list[tuple[Path, str, dict]] = []
     all_entries += _collect_cards()
     all_entries += _collect_alphanum()
+    all_entries += _collect_greek()
     all_entries += _collect_dice()
     all_entries += _collect_suits()
     all_entries += _collect_mahjong()

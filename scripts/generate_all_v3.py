@@ -167,6 +167,17 @@ PR = 10
 # ════════════════════════════════════════════
 ALPHANUM = [(ch,f"char_{ch}") for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"]
 
+# ギリシャ大文字（Α–Ω）。ファイル名はローマ字ステム（char_Alpha 等）。
+GREEK_UPPER = {
+    "Α": "Alpha",   "Β": "Beta",    "Γ": "Gamma",   "Δ": "Delta",
+    "Ε": "Epsilon", "Ζ": "Zeta",    "Η": "Eta",     "Θ": "Theta",
+    "Ι": "Iota",    "Κ": "Kappa",   "Λ": "Lambda",  "Μ": "Mu",
+    "Ν": "Nu",      "Ξ": "Xi",      "Ο": "Omicron", "Π": "Pi",
+    "Ρ": "Rho",     "Σ": "Sigma",   "Τ": "Tau",     "Υ": "Upsilon",
+    "Φ": "Phi",     "Χ": "Chi",     "Ψ": "Psi",     "Ω": "Omega",
+}
+GREEK = [(ch, f"char_{name}") for ch, name in GREEK_UPPER.items()]
+
 def gen_alphanum(v: V, out: Path):
     out.mkdir(parents=True, exist_ok=True)
     font = lf(96)
@@ -175,6 +186,15 @@ def gen_alphanum(v: V, out: Path):
         draw.text((C, C+4), ch, font=font, fill=v.text, anchor="mm")
         img.save(out/f"{stem}.png","PNG",optimize=True)
     return len(ALPHANUM)
+
+def gen_greek(v: V, out: Path):
+    out.mkdir(parents=True, exist_ok=True)
+    font = lf(96)
+    for ch, stem in GREEK:
+        img, draw = base(v)
+        draw.text((C, C+4), ch, font=font, fill=v.text, anchor="mm")
+        img.save(out/f"{stem}.png","PNG",optimize=True)
+    return len(GREEK)
 
 # ════════════════════════════════════════════
 # ダイス出目
@@ -275,11 +295,13 @@ def main():
     grand = 0
     for v in VARIANTS:
         a_dir = DIST/"alphanum"/v.key
+        g_dir = DIST/"alphanum_greek"/v.key
         d_dir = DIST/"dice"/v.key
         na = gen_alphanum(v, a_dir)
+        ng = gen_greek(v, g_dir)
         nd = gen_dice(v, d_dir)
-        print(f"  {v.label:4} ({v.key:10}): alphanum {na}枚  dice {nd}枚")
-        grand += na + nd
+        print(f"  {v.label:4} ({v.key:10}): alphanum {na}枚  greek {ng}枚  dice {nd}枚")
+        grand += na + ng + nd
     print(f"\n✓ 合計 {grand} 枚")
 
 if __name__ == "__main__":

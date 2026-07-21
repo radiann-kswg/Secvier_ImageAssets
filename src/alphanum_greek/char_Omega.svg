@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier Omega</title>
+  <g transform="matrix(0.512000,0,0,-0.512000,53.760,384.000)">
+    <path d="M657.5 700.0H132.5L45.0 612.5V350.0L132.5 262.5V175.0L45.0 87.5V0.0H307.5V350.0L220.0 437.5V525.0H570.0V437.5L482.5 350.0V0.0H745.0V87.5L657.5 175.0V262.5L745.0 350.0V612.5Z" fill="#000000"/>
+  </g>
+</svg>

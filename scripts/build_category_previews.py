@@ -170,6 +170,53 @@ def build_alphanum():
     emoji_strip(dk, lt, cell=96, labels=labels).save(OUT / "alphanum_emoji.png")
 
 
+GREEK_NAMES = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta",
+               "Eta", "Theta", "Iota", "Kappa", "Lambda", "Mu",
+               "Nu", "Xi", "Omicron", "Pi", "Rho", "Sigma",
+               "Tau", "Upsilon", "Phi", "Chi", "Psi", "Omega"]
+
+
+def build_greek():
+    blocks = []
+    for v in VAR:
+        paths = []
+        for nm in GREEK_NAMES:
+            p = DIST / "alphanum_greek_dualmode" / v / f"char_{nm}_128.png"
+            if p.exists():
+                paths.append(str(p))
+        if not paths:
+            continue
+        blk = contact(paths, 6, 84, PANEL,
+                      label_fn=lambda p: Path(p).stem.split("_")[1],
+                      title=f"{v}  {VAR[v]}")
+        blocks.append(blk)
+    if not blocks:
+        return
+    cols = 2
+    rows = (len(blocks) + cols - 1) // cols
+    cw = max(b.width for b in blocks)
+    ch = max(b.height for b in blocks)
+    gap = 10
+    sheet = Image.new("RGB", (cols * cw + gap * (cols + 1), rows * ch + gap * (rows + 1)),
+                      (28, 28, 30))
+    for i, b in enumerate(blocks):
+        r, c = divmod(i, cols)
+        sheet.paste(b, (gap + c * (cw + gap), gap + r * (ch + gap)))
+    sheet.save(OUT / "greek_proto.png")
+    # emoji: 各バリアントの Α/Σ/Ω を 暗/明 で
+    sample = ["Alpha", "Sigma", "Omega"]
+    dk, lt, labels = [], [], []
+    for v in VAR:
+        for nm in sample:
+            p = DIST / "alphanum_greek_dualmode" / v / f"char_{nm}_128.png"
+            if p.exists():
+                dk.append(str(p))
+                lt.append(str(p))
+                labels.append(f"{nm}/{VAR[v]}")
+    if dk:
+        emoji_strip(dk, lt, cell=96, labels=labels).save(OUT / "greek_emoji.png")
+
+
 def build_dice():
     # proto: 1バリアント(seiyuu)の全出目
     seiyuu = sorted(glob.glob(str(DIST / "dice" / "seiyuu" / "*.png")))
@@ -202,6 +249,7 @@ def main():
     build_cards()
     build_mahjong()
     build_alphanum()
+    build_greek()
     build_dice()
     print("previews ->", OUT)
     for p in sorted(OUT.glob("*.png")):

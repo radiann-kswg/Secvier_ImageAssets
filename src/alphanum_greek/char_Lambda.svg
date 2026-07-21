@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512"
+     width="512" height="512">
+  <title>Secvier Lambda</title>
+  <g transform="matrix(0.512000,0,0,-0.512000,60.160,384.000)">
+    <path d="M705.0 0.0V700.0H617.5L5.0 87.5V0.0H180.0L530.0 350.0V0.0Z" fill="#000000"/>
+  </g>
+</svg>
