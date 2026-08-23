@@ -203,7 +203,26 @@ python scripts/generate_mahjong_emoji.py # Discord/Misskey向けPNG生成
 
 # Misskey一括インポートzip生成 → _exported-dist/secvier-misskey-{timestamp}.zip
 python scripts/build_misskey_zip.py
+
+# README掲載プレビュー生成 → docs/previews/
+python scripts/build_category_previews.py
 ```
+
+### README掲載プレビューの更新（必須）
+
+`docs/previews/` の画像は README の顔であり、**収録内容が変わったら必ず作り直す**。
+
+| ファイル                        | 役割                                             |
+| ------------------------------- | ------------------------------------------------ |
+| `docs/previews/hero.png`        | README 冒頭バナー（全カテゴリの代表絵文字）      |
+| `docs/previews/glyphset.png`    | 収録内容一覧（カテゴリ別の全図柄＋バリアント見本）|
+| `docs/previews/{cat}_*.png`     | カテゴリ別 図柄一覧／絵文字サンプル              |
+
+- **更新トリガ**: `dist/` に図柄を追加・削除・再生成したとき、バリアントを増減したとき。
+- **手順**: `python scripts/build_category_previews.py` を実行し、生成画像を目視確認して
+  `dist/` の変更と**同じコミットに含める**（README とプレビューの乖離を残さない）。
+- 新カテゴリを足したら `_sections()` に見出しと glob を 1 行追加する。
+  見出しは Pillow 既定フォントで描画するため **ASCII のみ**（日本語は豆腐になる）。
 
 ---
 
@@ -309,3 +328,5 @@ docs: update AGENTS.md with unified agent instructions
 - `docs/glyph_map.txt` を読んで利用可能グリフを把握してから作業すること
 - Python依存の追加は `requirements.txt` に記録し、インストール手順も更新すること
 - テスト実行: `python scripts/build.py --dry-run`
+- `dist/` を更新したら `python scripts/build_category_previews.py` でプレビューを
+  作り直し、同じコミットに含めること（→ [README掲載プレビューの更新](#readme掲載プレビューの更新必須)）
