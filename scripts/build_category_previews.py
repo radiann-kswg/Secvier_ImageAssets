@@ -12,7 +12,7 @@ from __future__ import annotations
 import glob
 import os
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).parent.parent
 DIST = ROOT / "dist"
@@ -277,6 +277,88 @@ def build_hero(cell: int = 128, pad: int = 14) -> None:
     s.save(OUT / "hero.png")
 
 
+GLYPHSET_BG = (28, 28, 30)
+GLYPHSET_SUB = (130, 130, 138)
+VAR_ORDER = ["seiyuu", "suigyoku", "kougyoku", "hakuji", "kokuji", "sakin"]
+
+
+def _sections() -> list[tuple[str, list[str]]]:
+    """収録一覧シートの (見出し, PNGパス列) を組み立てる。"""
+    def g(pat):
+        return sorted(glob.glob(str(DIST / pat)))
+
+    def variants(pat, names):
+        return [str(DIST / pat.format(v=v)) for v in names
+                if (DIST / pat.format(v=v)).exists()]
+
+    dice_v = [v for v in VAR_ORDER if (DIST / "dice" / v).is_dir()]
+    an_v = [v for v in VAR_ORDER if (DIST / "alphanum_dualmode" / v).is_dir()]
+    gr_v = [v for v in VAR_ORDER if (DIST / "alphanum_greek_dualmode" / v).is_dir()]
+    romaji = ", ".join
+    return [
+        ("Playing Cards  x2 platforms (Discord 256x256 / Misskey 256x320)",
+         g("cards/misskey/*.png")),
+        ("Suit Marks  dual-mode (light / dark)", g("suits_dualmode/*_512.png")),
+        ("Mahjong Tiles  x2 platforms", g("mahjong/misskey/*.png")),
+        (f"Dice  D4-D20 + D%  [{dice_v[0] if dice_v else '-'}]",
+         g(f"dice/{dice_v[0]}/*.png") if dice_v else []),
+        (f"Dice variants  {romaji(dice_v)}",
+         variants("dice/{v}/dice_d20_20.png", dice_v)),
+        (f"Alphanumeric  A-Z 0-9  dual-mode  [{an_v[0] if an_v else '-'}]",
+         g(f"alphanum_dualmode/{an_v[0]}/char_*_512.png") if an_v else []),
+        (f"Alphanumeric variants  {romaji(an_v)}",
+         variants("alphanum_dualmode/{v}/char_S_512.png", an_v)),
+        (f"Greek  Alpha-Omega  dual-mode  [{gr_v[2] if len(gr_v) > 2 else '-'}]",
+         g(f"alphanum_greek_dualmode/{gr_v[2]}/char_*_512.png") if len(gr_v) > 2 else []),
+        (f"Greek variants  {romaji(gr_v)}",
+         variants("alphanum_greek_dualmode/{v}/char_Omega_512.png", gr_v)),
+    ]
+
+
+def build_glyphset(cell: int = 54, pad: int = 24, gap: int = 7, width: int = 1240) -> None:
+    """収録内容の一覧シート（カテゴリ別の全図柄＋バリアント見本）。"""
+    secs = [(label, paths) for label, paths in _sections() if paths]
+    if not secs:
+        return
+    title_f, head_f, note_f = (ImageFont.load_default(size=s) for s in (34, 20, 15))
+    head_h, sec_gap = 34, 26
+
+    def flow(sheet, draw, paths, y):
+        x = pad
+        for p in paths:
+            im = load(p, cell)
+            if x > pad and x + im.width > pad + width:
+                x, y = pad, y + cell + gap
+            if sheet is not None:
+                sheet.paste(im, (x, y + (cell - im.height) // 2), im)
+            x += im.width + gap
+        return y + cell
+
+    def render(sheet):
+        draw = ImageDraw.Draw(sheet if sheet else Image.new("RGB", (1, 1)))
+        y = pad
+        if sheet:
+            draw.text((pad, y), "Secvier  /  custom emoji set", font=title_f, fill=TXT)
+            draw.text((pad, y + 42),
+                      "playing cards / suit marks / mahjong tiles / dice / "
+                      "alphanumeric / greek  -  gem-styled variants: "
+                      + ", ".join(VAR_ORDER),  # 既定フォントは日本語不可のため romaji のみ
+                      font=note_f, fill=GLYPHSET_SUB)
+        y += 74
+        for label, paths in secs:
+            if sheet:
+                draw.text((pad, y), f"{label}  {len(paths)}", font=head_f,
+                          fill=GLYPHSET_SUB)
+            y = flow(sheet, draw, paths, y + head_h) + sec_gap
+        return y - sec_gap + pad
+
+    height = render(None)
+    sheet = Image.new("RGB", (width + pad * 2, height), GLYPHSET_BG)
+    render(sheet)
+    sheet.save(OUT / "glyphset.png")
+    print("glyphset ->", OUT / "glyphset.png", sheet.size)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     build_cards()
@@ -285,6 +367,7 @@ def main():
     build_greek()
     build_dice()
     build_hero()
+    build_glyphset()
     print("previews ->", OUT)
     for p in sorted(OUT.glob("*.png")):
         print("  ", p.name, Image.open(p).size)
