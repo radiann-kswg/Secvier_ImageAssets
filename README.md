@@ -1,5 +1,7 @@
 # Secvier ImageAssets
 
+![Secvier ImageAssets カスタム絵文字プレビュー（トランプ・麻雀牌・ダイス・英数字・ギリシャ文字）](docs/previews/hero.png)
+
 各種SNSおよびチャットサービス（Discord・Misskeyなど）向けに、**RadianN_kswg / ラジアン（柏木主税）による独自フォント Secvier** と **Claude による Agent 機能**、およびその他のアセットによって制作された、カスタム絵文字アセット群です。
 
 > **著作権者**: RadianN_kswg / ラジアン（柏木主税）

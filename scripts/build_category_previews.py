@@ -244,6 +244,39 @@ def build_dice():
         emoji_strip(dk, lt, cell=110, labels=labels).save(OUT / "dice_emoji.png")
 
 
+HERO_ROWS = [
+    ["cards/discord/card_S_A", "cards/discord/card_H_Q", "cards/discord/card_D_K",
+     "cards/discord/card_C_7", "cards/discord/card_joker_red",
+     "mahjong/discord/mj_man_5", "mahjong/discord/mj_pin_9",
+     "mahjong/discord/mj_sou_1", "mahjong/discord/mj_char_east"],
+    ["dice/seiyuu/dice_d20_20", "dice/kougyoku/dice_d6_6", "dice/suigyoku/dice_d12_12",
+     "dice/sakin/dice_d10_5", "dice/hakuji/dice_d8_8",
+     "alphanum_dualmode/seiyuu/char_S_128", "alphanum_dualmode/kougyoku/char_V_128",
+     "alphanum_greek_dualmode/suigyoku/char_Alpha_128",
+     "alphanum_greek_dualmode/sakin/char_Omega_128"],
+]
+
+
+def build_hero(cell: int = 128, pad: int = 14) -> None:
+    """README 冒頭用の横長バナー（全カテゴリの代表絵文字）。"""
+    rows = [[str(DIST / f"{n}.png") for n in r if (DIST / f"{n}.png").exists()]
+            for r in HERO_ROWS]
+    rows = [r for r in rows if r]
+    if not rows:
+        return
+    cols = max(len(r) for r in rows)
+    W = cols * (cell + pad) + pad
+    H = len(rows) * (cell + pad) + pad
+    s = Image.new("RGB", (W, H), (28, 28, 30))
+    for r, paths in enumerate(rows):
+        y0 = pad + r * (cell + pad)
+        for c, p in enumerate(paths):
+            im = load(p, cell)
+            s.paste(im, (pad + c * (cell + pad) + (cell - im.width) // 2,
+                         y0 + (cell - im.height) // 2), im)
+    s.save(OUT / "hero.png")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     build_cards()
@@ -251,6 +284,7 @@ def main():
     build_alphanum()
     build_greek()
     build_dice()
+    build_hero()
     print("previews ->", OUT)
     for p in sorted(OUT.glob("*.png")):
         print("  ", p.name, Image.open(p).size)
