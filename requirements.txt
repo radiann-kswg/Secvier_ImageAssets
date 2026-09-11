@@ -24,3 +24,6 @@ numpy>=1.26.0
 
 # コート図柄再構成のラベリング処理（generate_cards_dualmode.py）
 scipy>=1.11.0
+
+# WOFF2 フォントの展開（extract_dela_kanji.py。fontTools が Dela Gothic One の woff2 を読むのに必要）
+brotli>=1.1.0
