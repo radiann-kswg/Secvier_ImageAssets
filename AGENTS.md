@@ -147,6 +147,10 @@ Secvier_ImageAssets/
   - `svgwrite` — SVGファイル生成補助
   - `click` — CLIインターフェース
 - **フォントファイル**: `assets/fonts/Secvier.otf`
+- **libcairo（OS 別の注意）**: `cairosvg` が使う libcairo は pip では入らない。
+  - macOS（Homebrew）: `brew install cairo`。`/opt/homebrew/lib` は dyld の既定の探索先に無いため
+    `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` を渡してから実行する。
+  - Windows: libcairo の DLL（例: KiCad 同梱の `cairo-2.dll`）があるディレクトリを `PATH` に足す。
 - **外部アセット**:
   - `src/noto_cards/` — Noto Emoji playing card SVG（Google LLC, SIL OFL 1.1）
   - `src/ext_mahjong/` — 麻雀牌用外部素材（一索鳥 CC0、季節牌花絵柄 CC BY 4.0）

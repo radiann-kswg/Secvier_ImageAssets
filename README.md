@@ -173,9 +173,18 @@ Secvier_ImageAssets/
 
 - Python 3.11+
 - 依存ライブラリ（`requirements.txt` 参照）
+- libcairo（`cairosvg` が使用。pip では入りません）
 
 ```bash
 pip install -r requirements.txt
+```
+
+macOS（Homebrew）では libcairo を入れ、Homebrew のライブラリを探索先に加えてから実行します
+（`/opt/homebrew/lib` は既定のライブラリ探索先に含まれないため）。
+
+```bash
+brew install cairo
+export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 ```
 
 ### トランプ絵文字の生成
